@@ -1,0 +1,118 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getMinorPlanetData, getZooniverseDiscussions, getZooniverseComments } from '../lib/api';
+
+const minorPlanets = await getMinorPlanetData();
+const discussions = await getZooniverseDiscussions(6403);
+let latestMentions = [];
+let discussionTitle = "";
+
+if (discussions.length > 0) {
+	// Find latest result discussion
+	const resultDisc = discussions.find((d: any) => d.title.toLowerCase().includes('result'));
+	if (resultDisc) {
+		discussionTitle = resultDisc.title;
+		const comments = await getZooniverseComments(resultDisc.id);
+		// Parse comments to find mentions.
+		// Usually the first comment has the table
+		if (comments.length > 0) {
+			const body = comments[0].body;
+			const lines = body.split('\n');
+			for (const line of lines) {
+				if (line.toLowerCase().includes('manto') || line.toLowerCase().includes('vincenzo')) {
+					latestMentions.push(line);
+				}
+			}
+		}
+	}
+}
+
+// Function to extract subject ID from a Zooniverse text line
+function extractSubjectId(line: string) {
+	const match = line.match(/\b(\d{8,9})\b/);
+	return match ? match[1] : null;
+}
+---
+
+<Layout title="Astronomy">
+
+  <h2 style="margin-bottom: 2.5rem;">Astronomy Contributions</h2>
+{/* 
+  <section style="margin-bottom: 3rem;">
+    <h3>Zooniverse: The Daily Minor Planet</h3>
+    {discussionTitle ? (
+      <div class="card">
+        <h4 style="margin-bottom: 1.2rem;">Latest Results: {discussionTitle}</h4>
+        {latestMentions.length > 0 ? (
+          <ul style="padding-left: 1.2rem;">
+            {latestMentions.map((mention) => {
+              const subjectId = extractSubjectId(mention);
+              return (
+                <li style="margin-bottom: 1.2rem;">
+                  <p style="margin-bottom: 0.5rem; font-family: var(--font-mono); font-size: 1.05rem;">{mention}</p>
+                  {subjectId && (
+                    <img src={mention.Thumbnail} alt={`Subject ${subjectId}`} style="max-width: 200px; border-radius: 4px; box-shadow: 0 1px 4px #d1e0f5;" onerror="this.style.display='none'" />
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <div class="error-message">Nothing found yet <b>{discussionTitle}</b>.</div>
+        )}
+      </div>
+    ) : (
+      <div class="error-message">Nothing found</div>
+    )}
+  </section> */}
+
+  <section>
+    <h3>Minor Planet Discoveries</h3>
+    <div class="card">
+      {minorPlanets.length > 0 ? (
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Subject ID</th>
+                <th>Designation</th>
+                <th>Category</th>
+                <th>Link</th>
+				<th>Images</th>
+              </tr>
+            </thead>
+            <tbody>
+              {minorPlanets.map((planet: any, i: number) => (
+                <tr>
+                  <td>{planet['Subject ID']}</td>
+                  <td>{planet['Designation']}</td>
+                  <td>{planet['Category']}</td>
+                  <td>
+                    {planet['Link'] ? <a href={planet['Link']} target="_blank">MPEC</a> : <span style="color: #aaa;">N/A</span>}
+					<a href={`https://www.zooniverse.org/projects/fulsdavid/the-daily-minor-planet/talk/subjects/${planet['Subject ID']}`} target="_blank" style="margin-left: 1rem; font-size: 0.9rem; color: var(--color-primary);">View</a>
+                  </td>
+				  <td>
+					<div class="gallery-wrapper">
+  <input type="checkbox" id="zoom-trigger" class="zoom-checkbox">
+  <label for="zoom-trigger" class="image-gallery">
+		  {planet && planet.Thumbnails ? (
+			planet.Thumbnails.map((thumb: string, index: number) => (
+			  <img key={index} src={thumb} alt={`Thumbnail ${index + 1}`} style="max-width: 100%; margin-bottom: 1rem;" />
+			))
+		  ) : (
+			<p>No images available.</p>
+		  )}
+		    </label>
+		</div>
+				  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div class="error-message">Nothing found yet in the minor planets log.</div>
+      )}
+    </div>
+  </section>
+</Layout>

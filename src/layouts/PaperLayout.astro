@@ -1,0 +1,47 @@
+---
+import Layout from './Layout.astro';
+const { frontmatter } = Astro.props;
+---
+
+<Layout title={frontmatter.title}>
+	<article>
+	<table>
+		<tr>
+			<td><strong>Title:</strong></td>
+			<td>{frontmatter.title}</td>
+		</tr>
+		<tr>
+			<td><strong>Author:</strong></td>
+			<td>{frontmatter.author || 'Vincenzo Manto'}</td>
+		</tr>
+		<tr>
+			<td><strong>Date:</strong></td>
+			<td><time>{new Date(frontmatter.date).toLocaleDateString()}</time></td>
+		</tr>
+		<tr>
+			<td><strong>Link:</strong></td>
+			<td><a href={frontmatter.link} target="_blank">{frontmatter.link}</a></td>
+		</tr>
+		{frontmatter.doi && (
+			<tr>
+				<td><strong>DOI:</strong></td>
+				<td><a href={`https://doi.org/${frontmatter.doi}`} target="_blank">{frontmatter.doi}</a></td>
+			</tr>
+		)}
+	</table>
+		<header style="text-align: center; margin-bottom: 2rem; border-bottom: none;">
+			<h1 style="width: 100%;     text-align: center;margin-bottom: 40px;border-bottom: 2px solid #000;padding-bottom: 10px;" >{frontmatter.title}</h1>
+			
+		</header>
+		
+		{frontmatter.abstract && (
+			<div class="paper-abstract">
+				<strong>Abstract:</strong> {frontmatter.abstract}
+			</div>
+		)}
+
+		<div class="paper-layout">
+            <slot />
+        </div>
+	</article>
+</Layout>

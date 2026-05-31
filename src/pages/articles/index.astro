@@ -1,0 +1,38 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getPapers } from '../../lib/api';
+
+const externalPapers = await getPapers();
+// Fetch all markdown files in the pages/articles folder
+const allArticles = Object.values(import.meta.glob('./*.mdx', { eager: true }));
+allArticles.push(...externalPapers.map(paper => ({ url: paper.link, frontmatter: paper })));
+// Sort by date if available
+const sortedArticles = allArticles.sort((a, b) => {
+    const dateA = new Date(a.frontmatter.date || 0);
+    const dateB = new Date(b.frontmatter.date || 0);
+    return dateB.getTime() - dateA.getTime();
+});
+---
+
+<Layout title="Papers & Articles">
+	<h2>Papers & Articles</h2>
+	
+	<div style="margin-top: 2rem;">
+		{sortedArticles.length > 0 ? (
+			sortedArticles.map((article) => (
+				<div class="card">
+					<h3><a href={article.url}>{article.frontmatter.title}</a></h3>
+					<p class="meta">
+						Date: {new Date(article.frontmatter.date).toLocaleDateString()}
+						{article.frontmatter.doi && ` | DOI: ${article.frontmatter.doi}`}
+					</p>
+					{article.frontmatter.abstract && (
+						<p>{article.frontmatter.abstract}</p>
+					)}
+				</div>
+			))
+		) : (
+			<p>No articles found. Add MDX files to the src/pages/articles directory.</p>
+		)}
+	</div>
+</Layout>

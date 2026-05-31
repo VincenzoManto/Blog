@@ -1,0 +1,38 @@
+---
+import '../styles/global.css';
+
+export interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1><a href="/">Vincenzo Manto</a></h1>
+				<nav>
+					<a href="/math">Math (OEIS)</a>
+					<a href="/astronomy">Astronomy</a>
+					<a href="/articles">Papers</a>
+				</nav>
+			</header>
+			<main>
+				<slot />
+			</main>
+			<footer style="margin-top: 4rem; text-align: center; border-top: 1px solid var(--color-border); padding-top: 1rem; font-size: 0.8rem; color: var(--color-text-light);">
+				&copy; {new Date().getFullYear()} Vincenzo Manto. Built with Astro.
+			</footer>
+		</div>
+	</body>
+</html>

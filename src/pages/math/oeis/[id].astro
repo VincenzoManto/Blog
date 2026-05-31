@@ -1,0 +1,77 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { getOEISDataFull } from '../../../lib/api';
+const data =  (await getOEISDataFull()).map(({ props }) => props);
+
+export async function getStaticPaths() {
+  return await getOEISDataFull();
+  
+}
+
+const { seq, custom } = Astro.props;
+
+---
+
+<Layout title={`${seq.draft ? 'Draft' : ''} ${custom.name || ''} A${seq.number} - ${seq.name}`} description={seq.comment}>
+	<div class="container">
+	<div style="margin-bottom: 2.2rem;">
+		<h1><a href={`https://oeis.org/A${seq.number}`} target="_blank">{
+			seq.draft ? '[Draft] ' : ''
+		}{custom.name || `A${seq.number}`}</a></h1>
+		<p class="meta">Created: {new Date(seq.created).toLocaleDateString()} | Author: {seq.author.replace(/_/g, ' ')}</p>
+		<p style="font-size: 1.15rem; font-weight: bold; font-family: var(--font-serif); color: var(--color-text); margin-top: 0.5rem;">{seq.name}</p>
+	</div>
+
+	{
+		Object.entries(custom).map(([key, value]) => {
+			if (key === 'name') return null; // already displayed as title
+			return (
+				<div class={value?.type}>
+					<h2>{key.charAt(0).toUpperCase() + key.slice(1)}</h2>
+					   <div set:html={value.text || value}></div>
+				</div>
+			);
+		})
+	}
+
+
+			<p>{seq.comment}</p>
+
+
+		<h2>Sequence Chart</h2>
+		<img src={`https://oeis.org/A${seq.number}/graph?png=1`} alt={`Graph of A${seq.number}`} style="max-width: 100%; height: auto; border-radius: 6px;" onerror="this.style.display='none'" />
+
+		<h2>Data</h2>
+		<div class="sequence-data">{seq.data}</div>
+
+	{seq.formula && (<>
+			<h2>Formula</h2>
+				{seq.formula.map((f: string) => f.trim() && <p>{f}</p>)}
+				</>
+	)}
+	{seq.program && (<>
+	<h2>Computational Implementations</h2>
+		{seq.program.join('\n').split(/^\(\w+\)/m)?.map((prog: string, index: number) => {
+			if (!prog.trim()) return null;
+			const match = seq.program.join('\n').match(new RegExp(`^\\((\\w+)\\)`, 'm'))[index];
+			const lang = match ? match.replace(/[\(\)]/g, '') : 'code';
+			const code = prog.replace(/^\(\w+\)/, '').trim();
+			return (
+				<div class="card" style="background: var(--color-bg-alt);">
+					<h4>{lang.toUpperCase()}</h4>
+					<pre><code>{code}</code></pre>
+				</div>
+			);
+		})}
+		{seq.mathematica && (
+			<div class="card" style="background: var(--color-bg-alt);">
+				<h4>Mathematica</h4>
+				<pre><code>{seq.mathematica}</code></pre>
+			</div>
+		)}
+	</>)}	
+	<h2>Cross-References</h2>
+	<p>See also OEIS entries: {seq.xref.map((xref: string) => <a href={`https://oeis.org/${xref}`} target="_blank">{xref}</a>).reduce((prev: any, curr: any) => [prev, ', ', curr])}</p>
+		
+		</div>
+</Layout>

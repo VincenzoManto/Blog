@@ -1,0 +1,315 @@
+/* Modern palette inspired by insightest.app */
+:root {
+  --font-serif: "Courier New", monospace;
+  --font-mono: "Courier New", monospace;
+  --font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --color-bg: #fff;
+  --color-bg-alt: #eee;
+  --color-text: #1a2233;
+  --color-text-light: #5a6b8a;
+  --color-link: #00d86f;
+  --color-link-hover: #00b159d;
+  --color-border: #ddd;
+  --color-card: #fff;
+  --color-error: #ffeded;
+  --color-success: #e6ffed;
+  --color-error-text: #b91c1c;
+  --color-success-text: #166534;
+  --max-width: 900px;
+}
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+    line-height: 1.6;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--color-card);
+  padding: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+.meta {
+  font-style: italic;
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+.sequence-data {
+  background-color: #f1f3f5;
+  padding: 15px;
+  border-left: 4px solid var(--color-link);
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  word-wrap: break-word;
+  border-radius: 0 4px 4px 0;
+}
+.definition-box {
+  background-color: #eee;
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 4px;
+  margin: 20px 0;
+}
+ul {
+  padding-left: 20px;
+}
+li {
+  margin-bottom: 8px;
+}
+.astro-code pre, .astro-code code {
+  background: none;
+}
+  .page {
+	break-inside: avoid; /* Evita di spezzare la pagina all'interno di questo div */
+	margin-bottom: 2cm; /* Spazio tra le pagine */
+	border-bottom: 1px dashed #ccc; /* Linea di separazione tra le pagine */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  }
+  .page h1, .page h2, .page h3 {
+    text-align: left;
+  }
+pre {
+  background-color: var(--code-bg);
+  padding: 15px;
+  border-radius: 4px;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+}
+code {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.9rem;
+}
+footer {
+  margin-top: 5px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  color: #6c757d;
+  text-align: center;
+}
+* {
+  box-sizing: border-box;
+}
+h1 {
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+  font-size: 2.2rem;
+  margin-top: 0;
+}
+body {
+  font-family: var(--font-sans);
+}
+
+a {
+  color: black;
+}
+.text-center {
+  text-align: center;
+}
+
+/* Nascondi la checkbox */
+.zoom-checkbox {
+  display: none;
+}
+.gallery-wrapper {
+  position: relative;
+  display: inline-block;
+  height: 100px;
+  width: 100%;
+}
+
+/* Quando la checkbox è selezionata, prendi il controllo della galleria */
+.zoom-checkbox:checked + .image-gallery {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.9); /* Sfondo scuro per effetto modal */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: zoom-out;
+}
+
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* Assicurati che le immagini si adattino quando è in modalità fullscreen */
+.zoom-checkbox:checked + .image-gallery img {
+  object-fit: contain; /* Mantiene le proporzioni */
+}
+/* Animate image-gallery as gif */
+.image-gallery img {
+  animation: gif 2s infinite linear;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  object-fit: cover;
+  height: 100%;
+}
+.image-gallery img:nth-child(1) {
+  animation-delay: 0s;
+}
+.image-gallery img:nth-child(2) {
+  animation-delay: 0.5s;
+}
+.image-gallery img:nth-child(3) {
+  animation-delay: 1.0s;
+}
+.image-gallery img:nth-child(4) {
+  animation-delay: 1.5s;
+}
+.image-gallery {
+  position: relative;
+  height: 100px;
+}
+@keyframes gif {
+  0% {
+    opacity: 1;
+
+  }
+  25% {
+    opacity: 1;
+
+
+  }
+  26% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+a:hover {
+  text-decoration: underline;
+  color: var(--color-link-hover);
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 2.5rem 1.5rem;
+}
+
+header {
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 1rem;
+  margin-bottom: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+nav a {
+  margin-left: 1rem;
+  font-family: var(--font-mono);
+  font-weight: bold;
+}
+
+
+.paper-abstract {
+  font-family: var(--font-serif);
+  font-style: italic;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-left: 4px solid var(--color-border);
+}
+
+.card {
+  background: var(--color-card);
+  border: 1.5px solid var(--color-border);
+  padding: 1.5rem 1.2rem;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+}
+code {
+  background: var(--color-bg-alt);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  /* handle wrap */
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+/* Error and Success messages */
+.error-message {
+  background: var(--color-error);
+  color: var(--color-error-text);
+  border-left: 4px solid #ef4444;
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+  font-weight: 500;
+}
+.success-message {
+  background: var(--color-success);
+  color: var(--color-success-text);
+  border-left: 4px solid #22c55e;
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+  font-weight: 500;
+}
+
+/* Table improvements */
+table {
+  background: var(--color-card);
+  border-radius: 6px;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+th,
+td {
+  text-align: left;
+  padding: 0.7rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+th {
+  background: var(--color-bg-alt);
+  font-weight: 600;
+  color: var(--color-text);
+}
+tr:last-child td {
+  border-bottom: none;
+}
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+div {
+  font-family: var(--font-mono);
+}
+
+.meta {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+  margin-bottom: 1rem;
+}
