@@ -1,0 +1,22 @@
+<!-- 404.html for GitHub Pages SPA routing -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <meta http-equiv="refresh" content="0; url=/Blog/">
+    <script>
+      // Redirect all requests to index.html preserving path for Astro SPA fallback
+      var l = window.location;
+      var base = '/Blog'; // Cambia se il repo ha nome diverso
+      var path = l.pathname.replace(base, '');
+      var search = l.search || '';
+      var hash = l.hash || '';
+      var newUrl = base + '/index.html?redirect=' + encodeURIComponent(path + search + hash);
+      window.location.replace(newUrl);
+    </script>
+  </head>
+  <body>
+    <p>Redirecting...</p>
+  </body>
+</html>

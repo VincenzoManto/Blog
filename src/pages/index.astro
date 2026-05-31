@@ -3,28 +3,28 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Vincenzo Manto - Academic Blog">
-	<section>
-		<h2>About</h2>
-		<p>
-			This blog serves as a personal academic portfolio, showcasing contributions to mathematics, astronomy, and epistemology. It features original research, reflections on scientific philosophy, and curated content from my work in the OEIS and Zooniverse projects. The goal is to provide a transparent and accessible record of my intellectual journey and to foster discussion around the nature of scientific inquiry.
-		</p>
-	</section>
+       <section>
+	       <h2>About</h2>
+	       <p>
+		       This blog serves as a personal academic portfolio, showcasing contributions to mathematics, astronomy, and epistemology. It features original research, reflections on scientific philosophy, and curated content from my work in the OEIS and Zooniverse projects. The goal is to provide a transparent and accessible record of my intellectual journey and to foster discussion around the nature of scientific inquiry.
+	       </p>
+       </section>
 
-	<section style="margin-top: 3rem;">
-		<h2>Explore Sections</h2>
-		<div class="card" style="margin-top: 1rem;">
-			<h3><a href="/math">Mathematics (OEIS)</a></h3>
-			<p>Explore integer sequences authored or co-authored in the On-Line Encyclopedia of Integer Sequences.</p>
-		</div>
+       <section style="margin-top: 3rem;">
+	       <h2>Explore Sections</h2>
+	       <div class="card" style="margin-top: 1rem;">
+		       <h3><a href={import.meta.env.BASE_URL + 'math'}>Mathematics (OEIS)</a></h3>
+		       <p>Explore integer sequences authored or co-authored in the On-Line Encyclopedia of Integer Sequences.</p>
+	       </div>
 
-		<div class="card">
-			<h3><a href="/astronomy">Astronomy</a></h3>
-			<p>Daily minor planet discoveries, discussions, and Zooniverse contributions.</p>
-		</div>
+	       <div class="card">
+		       <h3><a href={import.meta.env.BASE_URL + 'astronomy'}>Astronomy</a></h3>
+		       <p>Daily minor planet discoveries, discussions, and Zooniverse contributions.</p>
+	       </div>
 
-		<div class="card">
-			<h3><a href="/articles">Papers & Articles</a></h3>
-			<p>In-depth considerations, epistemological essays, and academic papers.</p>
-		</div>
-	</section>
+	       <div class="card">
+		       <h3><a href={import.meta.env.BASE_URL + 'articles'}>Papers & Articles</a></h3>
+		       <p>In-depth considerations, epistemological essays, and academic papers.</p>
+	       </div>
+       </section>
 </Layout>

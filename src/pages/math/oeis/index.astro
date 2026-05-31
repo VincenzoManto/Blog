@@ -22,7 +22,7 @@ const topCollaborators = new Set(...data.reduce((acc, { seq }) => {
   <div>
     {data.map(({seq,custom}) => (
       <div class="card">
-        <h3 style="margin-bottom: 0.5rem;"><a href={`/math/A${seq.number}`}>
+        <h3 style="margin-bottom: 0.5rem;"><a href={`${import.meta.env.BASE_URL}math/A${seq.number}`}>
 		{seq.draft ? '[Draft] ' : ''}
 		{custom?.name} A{seq.number}</a>: {seq.name}</h3>
         <p class="meta">Created: {new Date(seq.created).toLocaleDateString()} | Author: {seq.author.replace(/_/g, ' ')}</p>
