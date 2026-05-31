@@ -7,5 +7,5 @@ import mdx from '@astrojs/mdx';
 export default defineConfig({
   integrations: [mdx()],
   output: 'static',
-  base: '/Blog', // Cambia 'Blog' con il nome del repo se diverso
+  base: '/Blog/', // Cambia 'Blog' con il nome del repo se diverso
 });
