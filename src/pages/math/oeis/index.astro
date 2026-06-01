@@ -16,7 +16,7 @@ const topCollaborators = new Set(...data.reduce((acc, { seq }) => {
   <p style="color: var(--color-text-light); margin-bottom: 2rem;">Vincenzo Manto is the authro of {data.length} integer sequences in the OEIS database.
   His work has contributed to the field of integer sequences, ranging from <code>{data[0].custom?.name || data[0].seq?.name}</code> (A{data[0].seq.number}) to <code>{data[data.length - 1].custom?.name || data[data.length - 1].seq?.name}</code> (A{data[data.length - 1].seq.number}).<br>
   His most prolific partners include {topCollaborators}.<br>
-  These sequences have been cited by {data.reduce((acc, { seq }) => acc + seq.xref.length, 0)} other sequences, making him a {perc}-percentile contributor.
+  These sequences have been cited by {data.reduce((acc, { seq }) => acc + (seq.xref?.length || 0), 0)} other sequences, making him a {perc}-percentile contributor.
   </p>
 
   <div>
@@ -26,7 +26,7 @@ const topCollaborators = new Set(...data.reduce((acc, { seq }) => {
 		{seq.draft ? '[Draft] ' : ''}
 		{custom?.name} A{seq.number}</a>: {seq.name}</h3>
         <p class="meta">Created: {new Date(seq.created).toLocaleDateString()} | Author: {seq.author.replace(/_/g, ' ')}</p>
-        <p class="meta"><strong>Cited by:</strong> {seq.xref.length} sequences</p>
+        <p class="meta"><strong>Cited by:</strong> {seq.xref?.length || 0} sequences</p>
       </div>
     ))}
 
