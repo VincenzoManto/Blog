@@ -23,7 +23,7 @@ const { seq, custom } = Astro.props;
 	</div>
 
 	{
-		Object.entries(custom).map(([key, value]) => {
+		Object.entries(custom)?.map(([key, value]) => {
 			if (key === 'name') return null; // already displayed as title
 			return (
 				<div class={value?.type}>
@@ -46,7 +46,7 @@ const { seq, custom } = Astro.props;
 
 	{seq.formula && (<>
 			<h2>Formula</h2>
-				{seq.formula.map((f: string) => f.trim() && <p>{f}</p>)}
+				{seq.formula?.map((f: string) => f.trim() && <p>{f}</p>)}
 				</>
 	)}
 	{seq.program && (<>
@@ -71,7 +71,7 @@ const { seq, custom } = Astro.props;
 		)}
 	</>)}	
 	<h2>Cross-References</h2>
-	<p>See also OEIS entries: {seq.xref.map((xref: string) => <a href={`https://oeis.org/${xref}`} target="_blank">{xref}</a>).reduce((prev: any, curr: any) => [prev, ', ', curr])}</p>
+	<p>See also OEIS entries: {seq.xref?.map((xref: string) => <a href={`https://oeis.org/${xref}`} target="_blank">{xref}</a>).reduce((prev: any, curr: any) => [prev, ', ', curr])}</p>
 		
 		</div>
 </Layout>
