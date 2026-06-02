@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-
+import 'katex/dist/katex.min.css';
 export interface Props {
 	title: string;
 }
@@ -16,6 +16,8 @@ const { title } = Astro.props;
 		<link rel="icon" type="image/svg+xml" href={import.meta.env.BASE_URL + 'favicon.svg'} />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<link rel="stylesheet" href="https://jsdelivr.net">
+
 	</head>
 	<body>
 		<div class="container">
