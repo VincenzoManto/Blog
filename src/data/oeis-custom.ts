@@ -25,5 +25,6 @@ export const customSequences = {
     'Analytical Examples':
       '<ul><li><strong>6 is included:</strong> Factors are 2<sup>1</sup> and 3<sup>1</sup>. Here, <code>p=3</code>, <code>q=2</code>, <code>k=1</code>. Since 3 &gt; 2<sup>1</sup>, the system is valid.</li><li><strong>92 is included:</strong> Factors are 2<sup>2</sup> and 23<sup>1</sup>. Here, <code>p=23</code>, <code>q=2</code>, <code>k=2</code>. Since 23 &gt; 2<sup>2</sup> (23 &gt; 4), it is valid.</li><li><strong>90 is excluded:</strong> 90 = 2 · 3<sup>2</sup> · 5. It contains three distinct prime factors, violating the binary system rule.</li><li><strong>89 is excluded:</strong> 89 is a prime number, meaning it lacks a companion satellite system.</li><li><strong>80 is excluded:</strong> 80 = 2<sup>4</sup> · 5. Here, <code>p=5</code> and <code>q<sup>k</sup>=2<sup>4</sup>=16</code>. Since 5 &lt; 16, the satellite power overpowers the central prime.</li></ul>',
     'Cross-References': '<p>See also OEIS entries: <a href="https://oeis.org" target="_blank">A001358</a> (Semiprimes), <a href="https://oeis.org" target="_blank">A007774</a>.</p><footer>© 2026 Vincenzo Manto. Conceptualized in collaboration with James C. McMahon.</footer>',
-  }
+  },
+  
 };

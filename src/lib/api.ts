@@ -234,11 +234,12 @@ export async function getMinorPlanetData() {
     const sheetName = workbook.SheetNames[workbook.SheetNames.length - 2]; // Assuming data is in the last sheet
     const sheet = workbook.Sheets[sheetName];
     const result = xlsx.utils.sheet_to_json(sheet);
+    console.log(workbook.SheetNames)
     // Filter to only rows where username contains Manto / Vincenzo Manto
     // (Adjust the field names based on actual headers)
     const mentions: any[] = result.filter((row: any) => {
       const user = (row['Username'] || '').toLowerCase();
-      return user.includes('maiorana') || user.includes('vincenzo');
+      return user.includes('manto') || user.includes('vincenzo');
     });
     const promises = mentions.map(async (mention) => {
       const subjectId = mention['Subject ID'];
