@@ -96,8 +96,8 @@ function extractSubjectId(line: string) {
                   </td>
 				  <td>
 					<div class="gallery-wrapper">
-  <input type="checkbox" id="zoom-trigger" class="zoom-checkbox">
-  <label for="zoom-trigger" class="image-gallery">
+  <input type="checkbox" id={"zoom-trigger"+i} class="zoom-checkbox">
+  <label for={"zoom-trigger"+i} class="image-gallery">
 		  {planet && planet.Thumbnails ? (
 			planet.Thumbnails.map((thumb: string, index: number) => (
 			  <img key={index} src={thumb} alt={`Thumbnail ${index + 1}`} style="max-width: 100%; margin-bottom: 1rem;" />
