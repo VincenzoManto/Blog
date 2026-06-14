@@ -1,0 +1,99 @@
+---
+layout: '../../layouts/PaperLayout.astro'
+title: 'A proposal for a Fractal Catalog'
+author: 'Vincenzo Manto'
+date: '2026-06-14'
+abstract: 'This article proposes the creation of an Online Encyclopedia of Fractals (OEF), a comprehensive, standardized repository for cataloging the infinite diversity of fractal geometries. The OEF would utilize a novel, line-oriented domain-specific language called Fracta to encode fractal generation algorithms in a compact, human-readable format. The article also addresses the challenges of duplicate detection and mathematical mimicry in fractal classification, proposing automated visual fingerprinting and empirical dimension estimation techniques to ensure a clean, non-redundant database.'
+link: https://github.com/VincenzoManto/Fracta
+---
+# How we could catalog the infinity of fractals
+
+If you've spent any time down mathematical rabbit holes, you are probably intimately familiar with Neil Sloane's Online Encyclopedia of Integer Sequences (OEIS). It is an absolute treasure trove for discrete numbers. James and I have often published there. Cataloging integer sequences is quite simple from a CS perspective. But when I wondered if there was a similar repository for fractals, the answer was difficult to find. There are a few scattered databases, but they are mostly image-based and lack any standardized way to index the underlying mathematical formulas.
+
+Historically, our approach has been pretty messy. We usually dump lossy PNGs into web archives or write fragmented scripts in Python, C++, or Mathematica that don't talk to each other. Because the underlying algorithms are hidden behind different coding styles, it is incredibly difficult to tell if two different equations actually map to the exact same geometric shape.
+
+By introducing a standardized, ultra-lean language called **Fracta** alongside a strict data schema for a possible future online encyclopedia of fractals (OEF?), we might get a clean, plaintext index for infinity.
+
+![Fractal](/Blog/assets/mandelbrot.png)
+
+---
+
+## The first step: define a language to rule them all
+
+The core issue with fractal generation is syntactic bloat. To fix this, I thought to formalize a line-oriented Domain-Specific Language (DSL) to be read easily by both humans and compilers. I called it **Fracta**.
+
+Instead of forcing developers to write custom memory allocation scripts or complex graphic rendering pipelines, with Fracta I tried to unify the three main pillars of fractal generation under a single `ENGINE` directive:
+
+* **L_SYSTEM:** String-rewriting engines that pass commands to a stack-based "turtle" graphics tracker.
+* **PIXEL:** Escape-time formulas evaluated over a continuous complex plane (think classic Mandelbrot or Julia sets).
+* **IFS (Iterated Function Systems):** Stochastic linear transformations used to compute random affine mappings, like the classic Barnsley Fern.
+
+When dealing with L-Systems, Fracta uses an elegant, deterministic state vector tuple, $S = \langle x, y, \theta, \text{Stack} \rangle$, where the turtle's radial heading $\theta$ initializes at exactly $90.0^\circ$ (pointing straight up). As the compiler parses tokens like `F` (move forward and draw), `+` (rotate right), or `[` (push state to stack), it traces exact vector trajectories without any platform overhead.
+
+Here is a practical look at what the syntax looks like for a classic dual-state rewrite system:
+
+```text
+# Configuration for the Heighway Dragon Curve
+ENGINE L_SYSTEM
+AXIOM FX
+RULE X -> X+YF+
+RULE Y -> -FX-Y
+ANGLE 90
+ITER 10
+RENDER
+
+```
+
+[Fracta definition](https://vincenzomanto.github.io/Blog/articles/fracta/) is not obviously the only way to do this and may not even be the best. It's my first attempt at a clean, human-readable format that can be easily parsed by a compiler, and it might evolve as and if the OEF project develops.
+
+![Fractal](/Blog/assets/snowflake.png)
+
+---
+
+## Solving the "equivalence problem"
+
+If we want to build a true encyclopedia of fractals, we need to solve the problem of duplicates. The basic problem is: How do we know if two different mathematical formulas are actually describing the same geometric shape? This is what I call **The Equivalence Problem**.
+
+So we need to sort it out.
+
+From my basic knowledge, in fractal geometry, completely disparate mathematical frameworks can converge on identical geometric attractors. You could write an L-System or an Iterated Function System that look entirely different on paper, but produce the exact same spatial point-cloud. If you only index the source code or an image file hash, you will never realize they are actually duplicates.
+
+The OEF registry must thus handle this by passing every submission through a background rendering matrix to extract its physical geometric footprint, testing it via, at least, two automated steps I identified:
+
+### 1. Visual Fingerprinting via Jaccard IoU
+
+The system should bound-normalize the resulting point-set and map it to a discrete binary grid ($M \in \{0,1\}^{64 \times 64}$). It then calculates spatial occupancy similarity between a new submission $A$ and an existing entry $B$ using the Intersection over Union (IoU) index:
+
+$$IoU(A,B) = \left( \frac{|A \cap B|}{|A \cup B|} \right) \times 100$$
+
+If the visual correlation hits $75\%$ or higher, the system triggers a deeper mathematical comparison. This threshold is a balance between catching true duplicates and allowing for minor variations in rendering or scaling. I tested with a few known fractals and found that this threshold effectively captures identical shapes while minimizing false positives, but it can be adjusted as the database grows.
+
+### 2. Empirical Hausdorff Dimension Estimation
+
+To check if the shapes truly scale the same way, the compiler estimates the Minkowski-Bouligand (Box-Counting) dimension. It segments the footprint matrix across decreasing box scale-factors ($\epsilon$) to find the precise fractional density of the shape:
+
+$$D_H = \lim_{\epsilon \to 0} \frac{\log N(\epsilon)}{\log(1/\epsilon)}$$
+
+---
+
+## How to handle "mathematical mimicry"
+
+This is where things get wild. What happens if a submission looks exactly like an existing fractal, but its scaling behavior is fundamentally different? This is what I call **Mathematical mimicry**. It's the phenomenon where two different mathematical formulas can produce visually identical shapes, but their internal density and scaling properties diverge. I think this is the worst problem for the OEF, because it can lead to a flood of near-duplicates that are technically different but practically indistinguishable.
+
+I tried to develop it using a conditional conflict resolution routine:
+
+> Let $\Delta D = |D_H(\text{Submission}) - D_H(\text{Existing})|$
+> * If $IoU \ge 75\%$ AND $\Delta D \le 0.15 \rightarrow$ **REJECT** (It's a duplicate or scale variant).
+> * If $IoU \ge 75\%$ AND $\Delta D > 0.15 \rightarrow$ **ACCEPT AS ANOMALY**.
+
+It should prove that two entirely different mathematical formulas can construct a visually similar spatial footprint, yet exhibit completely divergent internal densities. Finding these anomalies is a massive deal for chaos theory research.
+
+---
+
+## What's next?
+
+By reducing complex mathematical systems down to deterministic, compressed text files that can be instantly evaluated, cross-referenced, and queried, the OEF standard is doing for geometry what the OEIS did for number theory. It's a massive step forward for computational mathematics, plotting hardware, and graphics engines alike.
+
+I'll be keeping a close eye on the repository as the database populates. Check out the [Fracta documentation](https://vincenzomanto.github.io/Blog/articles/fracta/) and take a look at the [Repo of Fracta compilers and renderers](https://github.com/VincenzoManto/Fracta). 
+
+As soon as the OEF goes live, I'll be sure to share it, with the help of James.
