@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.1",
+    "@astrojs/sitemap": "^3.7.3",
     "@remark-embedder/core": "^3.0.3",
     "astro": "^6.4.2",
     "chart.js": "^4.5.1",
