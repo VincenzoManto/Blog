@@ -1,0 +1,516 @@
+# Graph Encyclopedia (GES) v1.0
+
+**Subtitle:** An OEIS for Graphs, Networks, Trees, DAGs, and Combinatorial Structures
+
+---
+
+## Abstract
+
+This document specifies the data schema, canonicalization protocol, serialization format, and query language for the **Graph Encyclopedia Standard (GES)**.
+
+GES provides a plaintext, peer-submittable registry of finite graphs and combinatorial structures.
+
+Unlike existing graph databases, GES indexes graphs by their **canonical topology**, allowing structurally identical graphs to be automatically merged regardless of vertex labeling.
+
+The primary objective is to create a universal infrastructure for graph theory analogous to the role played by the Online Encyclopedia of Integer Sequences for discrete mathematics.
+
+---
+
+# 1. Motivation
+
+Currently:
+
+* graphs are scattered across papers
+* graph names are inconsistent
+* isomorphic graphs appear multiple times
+* graph properties are difficult to search
+
+Example:
+
+A graph can be represented as:
+
+```txt
+A-B
+B-C
+C-A
+```
+
+or
+
+```txt
+1-2
+2-3
+3-1
+```
+
+or
+
+```txt
+X-Y
+Y-Z
+Z-X
+```
+
+All describe the same topology.
+
+GES solves this through canonical graph fingerprints.
+
+---
+
+# 2. Core Principles
+
+A compliant implementation MUST satisfy:
+
+### Canonical Identity
+
+Graphs are indexed by structure rather than labels.
+
+### Isomorphism Invariance
+
+Two isomorphic graphs MUST resolve to the same identifier.
+
+### Plaintext Storage
+
+Every entry must remain human-readable.
+
+### Property Richness
+
+Every graph stores mathematical invariants.
+
+### Deterministic Serialization
+
+Every graph has a unique canonical byte representation.
+
+---
+
+# 3. Entry Structure
+
+Each graph receives a permanent ID:
+
+```txt
+G000001
+G000002
+G000003
+```
+
+---
+
+## Metadata Fields
+
+### %N
+
+Name
+
+```txt
+%N Complete Graph K5
+```
+
+---
+
+### %V
+
+Vertices
+
+```txt
+%V 5
+```
+
+---
+
+### %E
+
+Edges
+
+```txt
+%E 10
+```
+
+---
+
+### %C
+
+Comments
+
+```txt
+%C Smallest complete graph
+%C Non planar
+```
+
+---
+
+### %P
+
+Properties
+
+```txt
+%P planar=false
+%P connected=true
+%P bipartite=false
+```
+
+---
+
+### %R
+
+References
+
+```txt
+%R Harary, Graph Theory
+```
+
+---
+
+### %K
+
+Keywords
+
+```txt
+%K complete,dense,nonplanar
+```
+
+---
+
+# 4. Graph Definition Language (Grapha)
+
+GES introduces a DSL called:
+
+```txt
+Grapha
+```
+
+---
+
+## Example
+
+```txt
+GRAPH
+VERTICES 5
+
+EDGE 1 2
+EDGE 1 3
+EDGE 1 4
+EDGE 1 5
+
+EDGE 2 3
+EDGE 2 4
+EDGE 2 5
+
+EDGE 3 4
+EDGE 3 5
+
+EDGE 4 5
+END
+```
+
+---
+
+# 5. Canonicalization Engine
+
+The heart of GES.
+
+Every submitted graph is transformed into:
+
+```txt
+Canonical Adjacency Form (CAF)
+```
+
+using graph isomorphism algorithms.
+
+Recommended:
+
+```txt
+nauty
+bliss
+weisfeiler-lehman refinement
+```
+
+---
+
+Example:
+
+Both
+
+```txt
+1-2
+2-3
+3-1
+```
+
+and
+
+```txt
+A-B
+B-C
+C-A
+```
+
+produce:
+
+```txt
+CAF:
+011
+101
+110
+```
+
+---
+
+# 6. Fingerprint System
+
+Every graph receives:
+
+```txt
+Graph Fingerprint (GF)
+```
+
+Generated from:
+
+```txt
+canonical adjacency matrix
++
+degree sequence
++
+spectral signature
+```
+
+---
+
+Example:
+
+```txt
+GF:
+sha256(CAF)
+```
+
+---
+
+# 7. Mathematical Invariants
+
+Every entry automatically computes:
+
+### Order
+
+```txt
+n = |V|
+```
+
+### Size
+
+```txt
+m = |E|
+```
+
+### Degree Sequence
+
+```txt
+(4,4,4,4,4)
+```
+
+### Diameter
+
+```txt
+1
+```
+
+### Radius
+
+```txt
+1
+```
+
+### Chromatic Number
+
+```txt
+5
+```
+
+### Clique Number
+
+```txt
+5
+```
+
+### Eigenvalue Spectrum
+
+```txt
+4,-1,-1,-1,-1
+```
+
+### Automorphism Group Size
+
+```txt
+120
+```
+
+---
+
+# 8. Similarity Engine
+
+Unlike identity matching:
+
+```txt
+Identity = exact isomorphism
+```
+
+Similarity allows discovery.
+
+---
+
+## Graph Edit Distance
+
+```txt
+GED(A,B)
+```
+
+Minimum edge additions/removals needed.
+
+---
+
+## Spectral Similarity
+
+Compare eigenvalue vectors.
+
+---
+
+## Structural Jaccard
+
+```txt
+J(V,E)
+```
+
+for local neighborhood overlap.
+
+---
+
+# 9. Derived Families
+
+GES supports graph generators.
+
+Example:
+
+```txt
+FAMILY CompleteGraph(n)
+```
+
+```txt
+K1
+K2
+K3
+K4
+...
+```
+
+---
+
+```txt
+FAMILY CycleGraph(n)
+```
+
+```txt
+C3
+C4
+C5
+...
+```
+
+---
+
+```txt
+FAMILY Hypercube(n)
+```
+
+```txt
+Q1
+Q2
+Q3
+...
+```
+
+---
+
+# 10. Query Language
+
+GraphQL inspired syntax.
+
+Example:
+
+```txt
+FIND
+vertices > 50
+connected = true
+planar = false
+diameter <= 3
+```
+
+---
+
+Example:
+
+```txt
+FIND
+chromatic_number = 4
+clique_number = 3
+```
+
+---
+
+# 11. Example Entry
+
+```txt
+====================================================
+GRAPH ENCYCLOPEDIA ENTRY G000001
+====================================================
+
+%N Petersen Graph
+
+%V 10
+
+%E 15
+
+%C Counterexample generator
+%C Strongly regular graph
+
+%P connected=true
+%P planar=false
+%P bipartite=false
+
+%I chromatic=3
+%I diameter=2
+%I girth=5
+
+%K cubic,strongly_regular,petersen
+
+%G
+GRAPH
+
+EDGE 1 2
+EDGE 2 3
+EDGE 3 4
+...
+END
+
+====================================================
+```
+
+---
+
+# 12. Long-Term Vision
+
+OEIS catalogs **integer patterns**.
+
+GES would catalog **topological patterns**.
+
+The real breakthrough is not storing graphs.
+
+The breakthrough is:
+
+> Every graph ever published becomes addressable by a canonical identifier.
+
+Then papers could cite:
+
+```txt
+GES:G003481
+```
+
+instead of redrawing the graph.
+
