@@ -1,0 +1,402 @@
+---
+title: "Starx — AI-Powered Econometric Analysis Platform"
+subtitle: "Technical Whitepaper"
+version: "0.1"
+date: "2026-06-15"
+authors:
+  - name: "Starx Research"
+classification: "Confidential — Internal Distribution Only"
+---
+
+# Starx
+## AI-Powered Econometric Analysis Platform
+
+**Technical Whitepaper · v0.1 · June 2026**
+
+---
+
+## Abstract
+
+Starx is a conversational econometric analysis platform that bridges the gap between business users and quantitative methods. Users upload tabular datasets — sales records, financial statements, operational time series — and interact with an AI assistant that autonomously dispatches a suite of analytical tools: exploratory profiling, data cleaning, statistical transformations, causal discovery, external macro enrichment, model fitting, and Monte Carlo scenario simulation. Every numerical output is grounded in a tool execution; the system is architecturally prohibited from fabricating estimates. This document describes the platform's design principles, analytical capabilities, tool architecture, and the reasoning behind each technical decision.
+
+---
+
+## 1. Motivation
+
+Quantitative analysis in mid-market firms is bottlenecked by two competing constraints: the analytical methods required to answer strategic questions (forecast under macro shock, identify causal drivers, quantify scenario risk) are well-established in academic econometrics, yet their operationalisation demands either expensive specialised talent or months of implementation by data teams.
+
+Off-the-shelf business intelligence tools address visualisation and reporting but not inference. Statistical packages address inference but require programming expertise. Large-language-model assistants can narrate data but typically lack the disciplined computational back-end needed for trustworthy quantitative claims.
+
+Starx is designed to close this gap. The core design constraint is: **the AI assistant may never state a number it has not computed**. All figures, coefficients, percentages, and forecasts must originate from a verifiable tool call whose output is logged in the session artifact store.
+
+---
+
+## 2. System Architecture
+
+### 2.1 Layered Design
+
+The system is organised into four strictly separated layers:
+
+```
+┌────────────────────────────────────────────────────────┐
+│  React 18 Frontend  (Vite · Tailwind · react-plotly)   │
+└───────────────────────────┬────────────────────────────┘
+                            │  REST + SSE  /api/v2/
+┌───────────────────────────▼────────────────────────────┐
+│  FastAPI API Layer        engine/api/main.py            │
+└───────────────────────────┬────────────────────────────┘
+                            │
+┌───────────────────────────▼────────────────────────────┐
+│  AI Orchestrator          engine/ai/orchestrator.py     │
+│  ┌──────────┐  ┌────────────────────────────────────┐  │
+│  │ LLM      │  │ Tool Dispatch (12-round agentic     │  │
+│  │ Facade   │  │ loop, temperature = 0.0)            │  │
+│  └──────────┘  └────────────────────────────────────┘  │
+└───────────────────────────┬────────────────────────────┘
+                            │
+┌───────────────────────────▼────────────────────────────┐
+│  Tool Layer               engine/tools/*.py             │
+│  eda · data_prep · transform · deseason · dag           │
+│  macro_fetch · model_fit · plot · events · montecarlo   │
+└───────────────────────────┬────────────────────────────┘
+                            │
+┌───────────────────────────▼────────────────────────────┐
+│  Core Library             engine/core/*.py              │
+│  econometrics · causality · transforms · macro_search   │
+│  data_layer · data_prep                                 │
+└───────────────────────────┬────────────────────────────┘
+                            │
+┌───────────────────────────▼────────────────────────────┐
+│  Session Store            output/sessions/{uuid}/       │
+│  session.json · data.parquet                            │
+└────────────────────────────────────────────────────────┘
+```
+
+### 2.2 Agentic Loop
+
+The orchestrator implements a deterministic agentic loop capped at twelve rounds per user turn. At each round:
+
+1. The LLM receives the system prompt (containing dataset metadata), the full conversation history, and the tool schemas.
+2. If the LLM emits tool calls, the orchestrator dispatches them sequentially, appends results to the message list, and iterates.
+3. If the LLM emits no tool calls, the loop terminates and the assistant's text is returned to the user.
+
+The loop is specifically designed **not** to terminate after the first chart-producing tool. The LLM is instructed to execute complete analytical pipelines — for example, a scenario question triggers macro enrichment, model fitting, event definition, and Monte Carlo simulation in a single uninterrupted sequence.
+
+### 2.3 ToolResult Contract
+
+Every tool is a pure function with the signature:
+
+```python
+tool_name(df: pd.DataFrame, **hyperparams) -> ToolResult
+```
+
+The `ToolResult` dataclass is the universal return type:
+
+```python
+@dataclass
+class ToolResult:
+    df:         pd.DataFrame | None  # non-None only when the tool mutates the dataset
+    text:       str                  # narrative always populated
+    chart_spec: dict | None          # Plotly figure dict rendered by the frontend
+    artifact:   dict | None          # structured metrics, coefficients, forecast values
+    error:      str | None           # non-None signals failure; tools never raise
+```
+
+This contract ensures that errors are always surfaced as data, never as exceptions that could corrupt session state.
+
+### 2.4 Session Persistence
+
+Each upload creates a UUID-addressed session stored on disk:
+
+```
+output/sessions/{uuid}/
+  session.json    # messages, artifacts, profile, metadata
+  data.parquet    # current dataframe state (mutable by tools)
+```
+
+The orchestrator is the sole owner of disk I/O. Tools receive the dataframe as a function argument and return a potentially-mutated copy; the orchestrator decides whether to commit the new dataframe. This separation prevents race conditions and makes the tool layer fully testable without a filesystem.
+
+### 2.5 LLM Routing
+
+The LLM facade (`engine/ai/llm.py`) is the only module that imports `litellm`. All model selection, API key resolution, and provider routing is centralised here. Supported providers include Anthropic Claude, OpenAI GPT-4o, Google Gemini, and locally-served Ollama models. Temperature is set to `0.0` for all tool-calling turns to maximise determinism.
+
+---
+
+## 3. Analytical Capabilities
+
+### 3.1 Exploratory Data Analysis (`eda`)
+
+On first upload, the system automatically profiles the dataset:
+
+- **Topology detection** — classifies each dataset as *Time Series*, *Panel Data*, or *Cross-Sectional* using heuristics on datetime column presence, entity column cardinality, and row-per-period density.
+- **Column classification** — identifies numeric, datetime, and entity/category columns.
+- **Data quality scoring** — a `DQS` (Data Quality Score) on a 0–100 scale incorporating missingness rate, outlier prevalence, and format consistency.
+- **Transaction detection** — datasets with more than three rows per calendar month are automatically detected as transaction-level and aggregated to monthly totals before any time-series analysis.
+
+### 3.2 Data Preparation (`data_prep`)
+
+Automated cleaning via configurable strategies:
+
+| Strategy | Description |
+|---|---|
+| `median` | Impute missing numeric values with column median |
+| `mean` | Impute with column mean |
+| `ffill` | Forward-fill (appropriate for time series) |
+| `drop` | Remove rows with any missing values |
+| Winsorisation | Clip extreme values at configurable percentile bounds |
+
+For freeform transformation queries that do not match keyword patterns, the system routes through PandasAI (v3) configured with the same LLM provider and API credentials as the main assistant.
+
+### 3.3 Time Series Transformations (`transform`, `deseason`)
+
+The transformation layer exposes a unified `apply(series, op, params)` interface to the following operations:
+
+- **HP filter** — Hodrick-Prescott decomposition into trend and cyclical components, with configurable lambda parameter.
+- **STL decomposition** — Seasonal-Trend decomposition using LOESS, with automatic period detection.
+- **Differencing** — First or higher-order differencing for stationarity.
+- **Rolling statistics** — Rolling mean and rolling standard deviation with configurable window.
+
+Deseasonalisation (`deseason`) handles panel data by aggregating to a single time series before decomposition, then downsampling the resulting chart to at most 500 points using an adaptive resampling frequency (daily → weekly → monthly → quarterly → yearly) selected to keep the series under the display threshold.
+
+### 3.4 Causal Structure Discovery (`dag`)
+
+The `dag` tool applies three algorithms to discover causal relationships among numeric columns:
+
+| Algorithm | Mechanism | Best suited for |
+|---|---|---|
+| **PC algorithm** | Constraint-based, uses conditional independence tests | General causal graphs with many variables |
+| **LiNGAM** | Linear Non-Gaussian Acyclic Model, exploits non-Gaussianity | Datasets where error terms are non-Gaussian |
+| **Correlation DAG** | Directed correlation heuristic for fast exploration | Quick causal hypothesis generation |
+
+Results are returned as an edge list with source, target, and weight, rendered as a network graph in the frontend.
+
+### 3.5 Macro Data Enrichment (`macro_fetch`)
+
+The macro enrichment tool queries four external data sources:
+
+| Source | Coverage |
+|---|---|
+| **FRED** (Federal Reserve Economic Data) | 800,000+ macroeconomic series — CPI, GDP, rates, unemployment |
+| **Yahoo Finance** | FX rates, equity indices, commodity futures, ETFs |
+| **World Bank Open API** | Cross-country development indicators |
+| **DBnomics** | Aggregated statistical database covering ECB, Eurostat, IMF, OECD |
+
+A curated catalog of ~60 pre-mapped series (energy, metals, shipping, FX majors, FX emerging, equity indices, credit spreads, sovereign yields, inflation, labour markets) is maintained for fast keyword-based lookup. Fetched series are appended to the session dataframe as new columns, enabling their use as regressors in subsequent model fitting.
+
+Chart generation for fetched series automatically collapses duplicate dates (panel data) and downsamples to ≤500 display points to prevent browser rendering degradation.
+
+### 3.6 Econometric Model Fitting (`model_fit`)
+
+Model selection is topology-driven, enforced automatically:
+
+| Dataset Topology | Preferred Model | Rationale |
+|---|---|---|
+| **Panel Data** | MixedLM (Mixed Linear Model) | Captures fixed time effects and random entity-level effects simultaneously |
+| **Time Series** | SARIMAX | Accounts for autocorrelation, integration, and seasonal structure |
+| **Cross-Sectional** | OLS with HC3 standard errors | Appropriate for cross-sectional regression without temporal dynamics |
+
+The fitting pipeline:
+
+1. **Auto-detection** — `detect_topology()` classifies the dataset.
+2. **Aggregation** — Transaction-level data is aggregated to monthly totals; time features (`t`, `month_sin`, `month_cos`) are added as regressors.
+3. **Model fitting** — The appropriate model is fitted with configurable horizon.
+4. **Forecast baking** — For SARIMAX and PANEL_SARIMAX, `get_forecast(steps=24)` is called at fit time and stored in the model artifact as `forecast_values`. For MixedLM and OLS, the time-feature coefficients are extrapolated analytically. For VAR, a simulation-based forecast is generated.
+5. **Artifact storage** — All coefficients, p-values, AIC, R², residual standard deviation, slope, and forecast values are stored in `session.json`.
+
+The critical design principle: **forecasts are never flat**. A forecast that merely repeats the last observed value is uninformative. All model types now produce trajectory-aware projections grounded in the fitted model's dynamics.
+
+### 3.7 Scenario Event Definition (`events`)
+
+The `events` tool formalises macro scenario shocks as structured objects:
+
+```python
+{
+  "name":         str,    # e.g. "CPI inflation +2%"
+  "type":         str,    # "one-off" | "ramp" | "sustained"
+  "column":       str,    # target column the shock hits
+  "shock_pct":    float,  # magnitude as % change, e.g. -8.0
+  "start_period": int,    # 1-based offset from end of history
+  "duration":     int,    # number of periods the shock is active
+  "probability":  float,  # 0–1, fraction of simulations that experience the shock
+  "scar_effect":  float,  # 0–1, residual fraction persisting after duration ends
+}
+```
+
+The `type` field controls shock dynamics:
+- `one-off` — full magnitude applied uniformly across all active periods.
+- `ramp` — intensity increases linearly from 0 to full magnitude over the duration.
+- `sustained` — full magnitude for the duration, then `scar_effect * shock_pct` persists indefinitely.
+
+### 3.8 Monte Carlo Scenario Simulation (`montecarlo`)
+
+The Monte Carlo engine is the platform's primary scenario analysis tool. It is designed to answer questions of the form: *"If inflation rises 2% and the economy enters recession, what is the distribution of outcomes for my business KPI over the next 12 months?"*
+
+**Simulation procedure:**
+
+1. **Dataset aggregation** — The target column is aggregated to a clean univariate time series (summing panel data by date).
+2. **Model fitting** — `fit_econometrics` is called with the detected topology to produce a primary model. This ensures the simulation's distributional parameters are grounded in the actual model appropriate for the data type, not a generic OLS.
+3. **Parameter extraction** — The primary model's `slope` (drift per period) and `resid_std` (residual standard deviation) are read directly from the model artifact.
+4. **Shock matrix construction** — For each event, a `(horizon × n_simulations)` matrix of fractional shocks is constructed. Each simulation independently samples whether the event occurs (Bernoulli with `probability`), then applies the shock profile (`one-off`, `ramp`, or `sustained` with scar).
+5. **Path simulation** — Paths are generated as a multiplicative random walk:
+
+```
+path[t] = path[t-1] + slope + N(0, σ) + shock_matrix[t] * path[t-1]
+```
+
+6. **Percentile extraction** — P10, P50, and P90 paths are computed across all simulations.
+7. **Key path identification** — The actual simulation paths closest to the P10/P50/P90 final values are identified and highlighted in the chart.
+
+**Fan chart:**
+
+The output chart renders:
+- **300 thin semi-transparent simulation paths** (sampled from the full 1,000) showing the distributional mass.
+- **Three highlighted paths** — worst (red dotted), median (indigo solid), best (green dashed) — as the actual simulations closest to their respective percentiles.
+- **CI band** — shaded P10–P90 region using `fill="tonexty"`.
+- **Event bands** — each shock event is rendered as a shaded `vrect` with a dotted left-edge marker and annotation label.
+- **Historical series** — downsampled to ≤500 points preceding the forecast zone.
+
+---
+
+## 4. Scenario Analysis Pipeline
+
+For strategic questions involving external macro conditions, the platform executes the following autonomous pipeline without requiring user intervention between steps:
+
+```
+User question (natural language)
+        │
+        ▼
+macro_fetch ──── fetch CPI, GDP, sector-relevant series
+        │         retry with alternative IDs on failure
+        ▼
+model_fit ─────── detect topology → fit appropriate model
+        │         store forecast_values + slope + resid_std
+        ▼
+events ────────── translate user's scenario into structured shocks
+        │         (column, shock_pct, type, duration, probability, scar)
+        ▼
+montecarlo ─────── 1,000 paths using model's drift + residuals + shocks
+        │          returns P10/P50/P90 + fan chart + event bands
+        ▼
+narrative ─────── AI interprets results in business terms
+                  all figures drawn from tool artifacts, none invented
+```
+
+This pipeline is enforced by the system prompt. The LLM is explicitly prohibited from narrating numerical outcomes without first executing the full tool sequence.
+
+---
+
+## 5. Chart Rendering
+
+All charts are produced as Plotly figure dicts via `fig.to_dict()` (or `fig.to_json()`) and rendered in the frontend with `react-plotly.js`. This ensures:
+
+- Interactive pan/zoom/hover on all charts.
+- Consistent visual language across all tools.
+- No client-side chart computation — all data shaping and aggregation happens on the server.
+
+**Performance constraint:** All chart-generating tools enforce a maximum of 500 display points via the shared `downsample_for_chart(df, dt_col, value_cols)` utility, which selects the coarsest resampling frequency (D → W → ME → QE → YE) that keeps the series under the threshold. Panel data is collapsed to per-date mean before downsampling. This constraint prevents the browser rendering degradation observed with 300,000+ point series.
+
+---
+
+## 6. Multi-Provider LLM Support
+
+The platform is designed to be LLM-provider-agnostic via LiteLLM:
+
+| Tier | Provider | Model | Use case |
+|---|---|---|---|
+| **Local** | Ollama | gemma4, llama3 | Air-gapped / privacy-sensitive deployments |
+| **Fast** | Anthropic / OpenAI / Gemini | Claude Haiku / GPT-4o mini / Gemini Flash | Low-latency, high-volume |
+| **Balanced** | Anthropic / OpenAI / Gemini | Claude Sonnet / GPT-4o / Gemini Pro | Default production tier |
+| **Max** | Anthropic / OpenAI | Claude Opus / GPT-4 | Maximum reasoning quality |
+
+The active model is stored in `output/settings.json` and switchable at runtime via the settings API without server restart.
+
+---
+
+## 7. Design Constraints and Invariants
+
+The following invariants are enforced architecturally, not by convention:
+
+| Constraint | Mechanism |
+|---|---|
+| Tools never raise exceptions | All tools `try/except` and return `ToolResult(error=...)` |
+| Tools are stateless | No disk I/O in tools; all state owned by orchestrator |
+| LiteLLM isolated | Only `engine/ai/llm.py` imports `litellm` |
+| Dataframe immutability | All tools `.copy()` before mutation |
+| No fabricated numbers | System prompt rule 1; tool-result requirement enforced by loop design |
+| Topology-appropriate models | `detect_topology()` called before `fit_econometrics()`; model type enforced |
+| Chart point budget | `downsample_for_chart()` called in every chart-generating tool |
+| Forecast non-flatness | All model types store `forecast_values` at fit time; no model returns `[last_value] * horizon` |
+
+---
+
+## 8. Data Privacy and Security
+
+- All session data is stored locally under `output/sessions/`. No data is transmitted to third parties beyond the configured LLM provider API.
+- API keys are stored in `output/settings.json` (local file) and loaded into environment variables at request time. They are never returned to the frontend (masked as `***` in the config endpoint).
+- Sessions are UUID-addressed; sequential enumeration of session IDs is not feasible.
+- Each session's dataframe is stored as Parquet, a binary format not human-readable in the file system without tooling.
+
+---
+
+## 9. Current Limitations
+
+| Limitation | Notes |
+|---|---|
+| Single-file upload per session | Multi-dataset joins are not yet supported |
+| No authentication layer | Single-user local deployment only; multi-user requires an auth proxy |
+| Forecast accuracy | SARIMAX forecasts assume the historical data-generating process is stationary post-differencing; structural breaks reduce accuracy |
+| Monte Carlo drift model | Uses linear OLS slope from model artifact; does not yet incorporate SARIMAX's MA/AR dynamics in path simulation |
+| PandasAI v3 dependency | Freeform transforms require a valid LLM API key; local Ollama transforms may be slow |
+| Causal discovery scalability | LiNGAM and PC algorithms are capped at 6,000 rows and 16 columns |
+
+---
+
+## 10. Roadmap
+
+- **Multi-dataset session** — join enrichment data (macro, sector benchmarks) with the primary dataset in a single session graph.
+- **Structural break detection** — Chow test and Bai-Perron algorithm integrated into the `deseason` and `model_fit` pipeline.
+- **SARIMAX-aware Monte Carlo paths** — propagate the fitted AR/MA dynamics into the path simulation rather than using only the trend slope.
+- **Report generation** — structured PDF/DOCX export of the full analysis chain (data profile → model → scenario → recommendation).
+- **Multi-user deployment** — JWT authentication, per-user session namespacing, role-based tool access.
+- **Streaming tool progress** — extend SSE events to include partial chart specs for progressive rendering during long computations.
+
+---
+
+## Appendix A — Tool Reference
+
+| Tool | Input | Output | Topology |
+|---|---|---|---|
+| `eda` | df | Profile + DQS score | Any |
+| `data_prep` | df, strategy, winsorize_pct | Cleaned df | Any |
+| `transform` | df, query | New column(s) + chart | Any |
+| `deseason` | df, target_col, method, freq | Trend/cycle cols + chart | Time Series, Panel |
+| `dag` | df, method, target_col | Edge list + network chart | Any |
+| `macro_fetch` | df, series_id, source, transform | Enriched df + chart | Any |
+| `model_fit` | df, target_col, model_type, horizon | Coefficients + forecast + chart | Auto-detected |
+| `plot` | df, y_col, chart_type, x_col, group_col | Chart | Any |
+| `events` | df, events[] | Validated shock definitions | Any |
+| `montecarlo` | df, target_col, horizon, n_sims, events[] | Fan chart + P10/P50/P90 paths | Auto-detected |
+
+---
+
+## Appendix B — Macro Series Catalog (Selected)
+
+| Series ID | Name | Source | Category |
+|---|---|---|---|
+| `ITACPIALLMINMEI` | Italy CPI All Items | FRED | Inflation |
+| `CLVMNACSCAB1GQIT` | Italy Real GDP | FRED | Growth |
+| `CPIAUCSL` | US CPI Urban Consumers | FRED | Inflation |
+| `EURUSD=X` | EUR/USD Exchange Rate | Yahoo Finance | FX |
+| `CL=F` | Crude Oil WTI Front Month | Yahoo Finance | Energy |
+| `BZ=F` | Brent Crude | Yahoo Finance | Energy |
+| `GC=F` | Gold Spot | Yahoo Finance | Metals |
+| `HG=F` | Copper | Yahoo Finance | Metals |
+| `BDRY` | Dry Bulk Shipping Index | Yahoo Finance | Logistics |
+| `^GSPC` | S&P 500 | Yahoo Finance | Equity |
+| `^VIX` | CBOE Volatility Index | Yahoo Finance | Risk |
+| `DGS10` | US 10-Year Treasury Yield | FRED | Rates |
+| `BAMLH0A0HYM2` | US High Yield OAS | FRED | Credit |
+
+---
+
+*Starx — Confidential. June 2026.*
