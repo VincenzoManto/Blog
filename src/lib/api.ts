@@ -212,11 +212,10 @@ export async function getDraftOEISData(author = 'Vincenzo Manto') {
 
   try {
     const response = await fetchWithTimeout(baseUrl);
-    if (!response.ok) throw new Error(`Error fetching drafts: ${response.status} ${response.statusText}`);
+    if (!response.ok) return []; // 403 = not authenticated, skip silently
     const data = await response.json();
     return data?.list?.map((e: any) => e.sequence).map((seq: any) => ({ ...seq, draft: true })) || [];
-  } catch (error) {
-    console.error('Error fetching OEIS drafts:', error);
+  } catch {
     return [];
   }
 }
