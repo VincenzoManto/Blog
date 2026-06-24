@@ -15,5 +15,6 @@ export default defineConfig({
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeKatex],
   },
+  trailingSlash: 'always',
   base: '/Blog/', // Cambia 'Blog' con il nome del repo se diverso
 });
