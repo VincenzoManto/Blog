@@ -1,0 +1,172 @@
+---
+layout: '../../layouts/PaperLayout.astro'
+title: "Novel Fractals on Complex Space: trying to eradicate Mandelbrot Bulbous via Maps"
+version: "0.1"
+abstract: "Standard polynomial maps of the form $z_{n+1} = z_n^d + c$ invariably manifest structural cardioids or localized bulbous branch points within their parameter spaces. This paper explores alternative algebraic architectures that systematically suppress standard Mandelbrot-like morphology. We introduce three novel families of complex dynamical systems: parameter-variable transcendental tetration, rational maps bound by invariant imaginary poles, and non-holomorphic parameter-warped systems. Numerical experiments verify that these formulations disrupt classical boundary accumulation, yielding highly geometric, non-biomorphic filamentary networks and sharp phase-space fractures."
+date: "2026-06-24"
+---
+# Novel Fractals on Complex Space: trying to eradicate Mandelbrot Bulbous via Maps
+
+## Abstract
+The theory of complex dynamical systems has always centered on the study of the quadratic mapping family:
+
+$$z_{n+1} = z_n^2 + c$$
+
+The parameter plane of this map, also called the Mandelbrot set, is distinguished by the central hyperbolic element—the cardioid—and the unlimited distribution of bifurcating circle elements. Even upon the extension of the degree of polynomials ($z_{n+1} = z_n^d + c$, for $d \in \mathbb{N}_{\ge 3}$), the biomorphic structure remains consistent, only changing the number of lobes into $d-1$. 
+
+Such recurrence is not desired for researchers who want to have a totally different class of topologically distinct structures. In order to avoid such structural recurrence, it becomes necessary to change the algebraic mechanics of this map. The present paper explores the impact of displacement of the parameter $c$ from a simple translation factor into the denominator, transcendental base, and anti-holomorphic functions.
+---
+## The Mathematical Formulation and its Taxonomy
+
+In order to systematically escape classical boundary geometry, we define three architectural strategies for map composition.
+
+### Class A: Parameter-Variable Quadratic Tetration
+
+![Tetration fractal](/novel-fractals/tetration.png)
+
+Whereas classically one uses a fixed transcendental base (as in $z_{n+1} = e^{z_n^2} + c$), we use an architecture where the parameter $c \in \mathbb{C}$ is the variable base itself:
+
+$$z_{n+1} = c^{z_n^2}$$
+
+Using the complex logarithm through Euler's formula, the above system may be expressed as:
+
+$$z_{n+1} = \exp\left(z_n^2 \cdot \ln(c)\right)$$
+
+The shifting nature of the structure demands that the physics of the iteration space be entirely altered according to the spatial coordinates of each pixel. The principal branch cut of $\ln(c)$ at the negative real axis produces immediate directional discontinuity and changes the nature of the system greatly depending on which quadrant the coordinate falls into.
+
+### Class B: Rational Maps with Fixed Imaginary Poles
+
+![Bubble fractal or Universe fractal](/novel-fractals/bubbles.png)
+
+![Triangle fractal or Crystal fractal](/novel-fractals/triangle.png)
+
+Cardioid boundaries arise due to the gradual accumulation of global stability boundaries as $z$ moves away from the center in polynomial maps. However, by introducing explicit and invariant poles to the denominator of the map, we may introduce regions of definitive infinite divergence. Consider the system:
+$$z_{n+1} = \frac{c}{z_n^2 + 1}$$
+
+In this formula, the parameter $c$ acts as a universal multiplier, while the denominator creates two absolute poles at:
+
+$$z = \pm i$$
+
+When the orbit approaches the vicinity of these imaginary poles, the next iteration gets a violent push towards infinity. The topology of such poles substitutes the usual central cardioid by an array of perfectly bounded, hyper-geometric basins of attraction.
+
+### Class C: Asymmetric Warping of Anti-Holomorphic Parameter Spaces
+
+![Exp tricorn fractal](/novel-fractals/exp_tricorn.png)
+![Log tricorn fractal](/novel-fractals/log_tricorn.png)
+
+The well-known anti-holomorphic maps which use the complex conjugation $\bar{z}$ (for example, the Tricorn $z_{n+1} = \bar{z}_n^2 + c$) produce three-fold real cusps caused by non-analitycity of the reflection operation. We break up this inherent symmetry by applying the non-linear transcendental transform to the parameter vector before its feeding to the anti-holomorphic loop:
+
+$$z_{n+1} = \bar{z}_n^2 + \ln(c)$$
+
+$$z_{n+1} = \bar{z}_n^2 + \exp(c)$$
+
+As a result, the reflection mechanism becomes asymmetric because the parameter space gets warped before being passed to the anti-holomorphic process.
+---
+## Experiments
+
+The proposed dynamical systems have been analyzed via an escape-time algorithm implemented over discretized sectors of the complex plane $\mathbb{C}$.
+
+```text
+Resolution: 800 x 800 pixels
+Maximum Iterations (N): 50
+Divergence Threshold (R): 2.0
+```
+
+### Structural analysis of $z_{n+1} = c^{z_n^2}$
+
+Upon initialization at the critical point, the parameter-dependent tetration map produces an extremely asymmetric structure. Contrary to common biomorphs, there exist two major macro-structural elements in this system:
+
+* **Logarithmic Cut:** The logarithmic wedge cut creates an abrupt, linear opening in the left hemisphere along the negative real axis. This structural element corresponds to the discontinuity of the complex argument $\text{Arg}(c) = \pi$ and opens up the chaotic boundary layer into a deterministic V-shaped zone of divergence.
+* **Linear Filamentation:** The rounded bulb-like structures which characterize polynomials are substituted with highly frequent needle-like filaments directed along the positive real axis.
+
+### Basin Analysis of the Map $z_{n+1} = \frac{c}{z_n^2 + 1}$
+
+The presence of fixed poles completely changes the nature of the parameter space from organic shapes to crystal-like forms.
+
+> **Theorem on Boundary Rectification:** Due to the denominator $z_n^2 + 1$ approaching zero for $z_n \to \pm i$, the map operates as a high-frequency spatial filter. There are no self-similar filaments of the chaotic boundary; rather, there are regularly arranged circles of stability matrices, whose sizes decrease according to a geometric sequence defined by the ratio of the fixed poles.
+
+Graphically, the system forms perfectly symmetrical and very readable arrangements of geometrically nesting circles. The chaotic filamentation characteristic of the Mandelbrot structure is completely eliminated, with crystal-like borders formed between the periodic orbits and divergent areas.
+
+---
+
+## Architectural Comparison
+
+To quantify how effectively these alternative formulations eliminate biomorphic cardioids, we contrast their structural features against classical systems below:
+
+| Mapping Category | Representative Equation | Boundary Geometry Style | Primary Divergence Driver |
+| --- | --- | --- | --- |
+| **Classical Polynomial** | $z_{n+1} = z_n^2 + c$ | Biomorphic Cardioids & Bulbs | Polynomial Magnitude Growth |
+| **Parameter-Variable Tetration** | $z_{n+1} = c^{z_n^2}$ | Asymmetric Wedges & Needles | Complex Logarithm Phase Jumps |
+| **Rational Fixed-Pole** | $z_{n+1} = \frac{c}{z_n^2 + 1}$ | Crystalline Nested Circles | Pole Trajectory Intersection |
+| **Parameter-Warped Anti-Holomorphic** | $z_{n+1} = \bar{z}_n^2 + \ln(c)$ | Asymmetric Spiral Avulsions | Non-Analytic Phase Reflection |
+
+---
+## Thus...
+
+The experiments conducted in this paper prove that the "Mandelbrot bulb", which is considered an inevitable component of any fractal picture, is an artificial construct created by a very particular class of linear translation polynomials. Replacing the parameters with transcendental exponents or placing them below fixed poles allows the geometry to be liberated from its biomorphical form.
+
+In the future, the proofs of the convergence radius for $c^{z^2}$ and multi-frequency wave grids created by multiplying trigonometric functions and polynomial vectors of higher degree, like the family $z_{n+1} = \sin(z_n)\cos(z_n) + 2c^3$, will be researched further.
+
+You can explore the maps described in this article using the following Fracta playground: [https://vincenzomanto.github.io/Fracta](https://vincenzomanto.github.io/Fracta)
+
+## Appendix: Code Snippets
+
+```
+ENGINE PIXEL
+FORMULA z**4+c
+C_VAL 0.83j
+X_RANGE -1.5 1.5
+Y_RANGE -1.5 1.5
+RES 500
+ITER 50
+COLORMAP twilight_shifted
+RENDER
+
+
+ENGINE PIXEL
+FORMULA np.conj(z)**2 + np.log(c)
+X_RANGE -2 2.0
+Y_RANGE -2.0 2.0
+RES 800
+ITER 35
+COLORMAP plasma
+RENDER
+
+
+ENGINE PIXEL
+FORMULA np.conj(z)**2 + np.exp(c)
+X_RANGE -2 2.0
+Y_RANGE -2.0 2.0
+RES 800
+ITER 35
+COLORMAP plasma
+RENDER
+
+
+ENGINE PIXEL
+FORMULA 1.0 / (z**2 + c)
+X_RANGE -1.5 1.5
+Y_RANGE -1.5 1.5
+RES 800
+ITER 40
+COLORMAP plasma
+RENDER
+
+ENGINE PIXEL
+FORMULA c / (z**2 + 1)
+X_RANGE -1.5 1.5
+Y_RANGE -1.5 1.5
+RES 800
+ITER 40
+COLORMAP plasma
+RENDER
+
+ENGINE PIXEL
+FORMULA c ** (z**2)
+X_RANGE -1.5 1.5
+Y_RANGE -1.5 1.5
+RES 800
+ITER 40
+COLORMAP plasma
+RENDER
+```
