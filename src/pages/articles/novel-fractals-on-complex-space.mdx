@@ -4,25 +4,29 @@ title: "Novel Fractals on Complex Space: trying to eradicate Mandelbrot Bulbous 
 version: "0.1"
 abstract: "Standard polynomial maps of the form $z_{n+1} = z_n^d + c$ invariably manifest structural cardioids or localized bulbous branch points within their parameter spaces. This paper explores alternative algebraic architectures that systematically suppress standard Mandelbrot-like morphology. We introduce three novel families of complex dynamical systems: parameter-variable transcendental tetration, rational maps bound by invariant imaginary poles, and non-holomorphic parameter-warped systems. Numerical experiments verify that these formulations disrupt classical boundary accumulation, yielding highly geometric, non-biomorphic filamentary networks and sharp phase-space fractures."
 date: "2026-06-24"
+link: https://vincenzomanto.github.io/Fracta
 ---
 # Novel Fractals on Complex Space: trying to eradicate Mandelbrot Bulbous via Maps
 
 ## Abstract
+
 The theory of complex dynamical systems has always centered on the study of the quadratic mapping family:
 
 $$z_{n+1} = z_n^2 + c$$
 
 The parameter plane of this map, also called the Mandelbrot set, is distinguished by the central hyperbolic element—the cardioid—and the unlimited distribution of bifurcating circle elements. Even upon the extension of the degree of polynomials ($z_{n+1} = z_n^d + c$, for $d \in \mathbb{N}_{\ge 3}$), the biomorphic structure remains consistent, only changing the number of lobes into $d-1$. 
 
-Such recurrence is not desired for researchers who want to have a totally different class of topologically distinct structures. In order to avoid such structural recurrence, it becomes necessary to change the algebraic mechanics of this map. The present paper explores the impact of displacement of the parameter $c$ from a simple translation factor into the denominator, transcendental base, and anti-holomorphic functions.
+Such recurrence is not desired for researchers who want to have a totally different class of topologically distinct structures (and for me too). In order to avoid such structural recurrence, it becomes necessary to change the algebraic mechanics of this map. The present paper explores the impact of displacement of the parameter $c$ from a simple translation factor into the denominator, transcendental base, and anti-holomorphic functions.
+
 ---
+
 ## The Mathematical Formulation and its Taxonomy
 
 In order to systematically escape classical boundary geometry, we define three architectural strategies for map composition.
 
 ### Class A: Parameter-Variable Quadratic Tetration
 
-![Tetration fractal](/novel-fractals/tetration.png)
+![Tetration fractal](/Blog/assets/novel-fractals/tetration.png)
 
 Whereas classically one uses a fixed transcendental base (as in $z_{n+1} = e^{z_n^2} + c$), we use an architecture where the parameter $c \in \mathbb{C}$ is the variable base itself:
 
@@ -36,9 +40,9 @@ The shifting nature of the structure demands that the physics of the iteration s
 
 ### Class B: Rational Maps with Fixed Imaginary Poles
 
-![Bubble fractal or Universe fractal](/novel-fractals/bubbles.png)
+![Bubble fractal or Universe fractal](/Blog/assets/novel-fractals/bubbles.png)
 
-![Triangle fractal or Crystal fractal](/novel-fractals/triangle.png)
+![Triangle fractal or Crystal fractal](/Blog/assets/novel-fractals/triangle.png)
 
 Cardioid boundaries arise due to the gradual accumulation of global stability boundaries as $z$ moves away from the center in polynomial maps. However, by introducing explicit and invariant poles to the denominator of the map, we may introduce regions of definitive infinite divergence. Consider the system:
 $$z_{n+1} = \frac{c}{z_n^2 + 1}$$
@@ -51,8 +55,8 @@ When the orbit approaches the vicinity of these imaginary poles, the next iterat
 
 ### Class C: Asymmetric Warping of Anti-Holomorphic Parameter Spaces
 
-![Exp tricorn fractal](/novel-fractals/exp_tricorn.png)
-![Log tricorn fractal](/novel-fractals/log_tricorn.png)
+![Exp tricorn fractal](/Blog/assets/novel-fractals/exp_tricorn.png)
+![Log tricorn fractal](/Blog/assets/novel-fractals/log_tricorn.png)
 
 The well-known anti-holomorphic maps which use the complex conjugation $\bar{z}$ (for example, the Tricorn $z_{n+1} = \bar{z}_n^2 + c$) produce three-fold real cusps caused by non-analitycity of the reflection operation. We break up this inherent symmetry by applying the non-linear transcendental transform to the parameter vector before its feeding to the anti-holomorphic loop:
 
