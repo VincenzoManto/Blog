@@ -100,7 +100,7 @@ function extractSubjectId(line: string) {
   <label for={"zoom-trigger"+i} class="image-gallery">
 		  {planet && planet.Thumbnails ? (
 			planet.Thumbnails.map((thumb: string, index: number) => (
-			  <img key={index} src={thumb} alt={`Thumbnail ${index + 1}`} style="max-width: 100%; margin-bottom: 1rem;" />
+			  <img key={index} src={thumb} alt={`Thumbnail ${index + 1}`} style="max-width: 100%; margin-bottom: 1rem;" loading="lazy" />
 			))
 		  ) : (
 			<p>No images available.</p>

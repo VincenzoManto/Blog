@@ -1,11 +1,9 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import { getOEISDataFull } from '../../../lib/api';
-const data =  (await getOEISDataFull()).map(({ props }) => props);
 
 export async function getStaticPaths() {
   return await getOEISDataFull();
-  
 }
 
 const { seq, custom } = Astro.props;
@@ -39,7 +37,7 @@ const { seq, custom } = Astro.props;
 
 
 		<h2>Sequence Chart</h2>
-		<img src={`https://oeis.org/A${seq.number}/graph?png=1`} alt={`Graph of A${seq.number}`} style="max-width: 100%; height: auto; border-radius: 6px;" onerror="this.style.display='none'" />
+		<img src={`https://oeis.org/A${seq.number}/graph?png=1`} alt={`Graph of A${seq.number}`} style="max-width: 100%; height: auto; border-radius: 6px;" loading="lazy" onerror="this.style.display='none'" />
 
 		<h2>Data</h2>
 		<div class="sequence-data">{seq.data}</div>

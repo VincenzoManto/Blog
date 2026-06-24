@@ -3,19 +3,22 @@ import { customSequences } from '../data/oeis-custom';
 import { XMLParser } from 'fast-xml-parser';
 
 
+const FETCH_TIMEOUT_MS = 10000;
+
+function fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Response> {
+  return fetch(url, { ...options, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+}
+
 // Fetch OEIS Data
 export async function getOEISData(author = 'Vincenzo Manto') {
   const baseUrl = `https://oeis.org/search?q=author:%22${encodeURIComponent(author)}%22&fmt=json`;
 
-
-  async function fetchOeisPage(start) {
+  async function fetchOeisPage(start: number) {
     const targetUrl = `${baseUrl}&start=${start}`;
-    const proxyUrl = `https://cors.io/?url=${encodeURIComponent(targetUrl)}`;
-
-    const response = await fetch(proxyUrl);
+    // During build (Node.js), fetch OEIS directly — no CORS proxy needed
+    const response = await fetchWithTimeout(targetUrl);
     if (!response.ok) throw new Error(`Error ${start}`);
-    const wrapper = await response.json();
-    return JSON.parse(wrapper.body);
+    return response.json();
   }
 
   async function loadAllSequences() {
@@ -55,10 +58,9 @@ async function getImage(subjectId: string): Promise<string[]> {
   const url = base + endpoint + id;
 
   return new Promise((r) =>
-    fetch(url, {
+    fetchWithTimeout(url, {
       method: 'GET',
       headers: {
-        // ⚠️ FONDAMENTALE: Dice a Panoptes quale specifica versione dell'API usare
         Accept: 'application/vnd.api+json; version=1',
         'Content-Type': 'application/json',
       },
@@ -116,7 +118,7 @@ export async function getArxivPapers(query = 'au:"V. Manto" OR au:"Vincenzo Mant
   const baseUrl = `https://export.arxiv.org/api/query?search_query=${encodeURIComponent(query)}&max_results=${maxResults}`;
 
   try {
-    const response = await fetch(baseUrl);
+    const response = await fetchWithTimeout(baseUrl);
     if (!response.ok) throw new Error(`Error: ${response.status}`);
     
     const text = await response.text();
@@ -148,7 +150,7 @@ export async function getScholarPapers() {
   const url = 'https://scholar.google.com/citations?user=FIWfidAAAAAJ';
 
   try {
-    const response = await fetch(url);
+    const response = await fetchWithTimeout(url);
     const html = await response.text();
     
     // Dato che sei in ambiente node, usa 'cheerio' o il parser interno di jsdom 
@@ -207,14 +209,12 @@ export async function getOEISDataFull() {
 
 export async function getDraftOEISData(author = 'Vincenzo Manto') {
   const baseUrl = `https://oeis.org/draft?user=${encodeURIComponent(author)}&fmt=json`;
-  // no need for pagination here since drafts are usually few
-  const proxyUrl = `https://cors.io/?url=${encodeURIComponent(baseUrl)}`;
 
   try {
-    const response = await fetch(proxyUrl);
+    const response = await fetchWithTimeout(baseUrl);
     if (!response.ok) throw new Error(`Error fetching drafts: ${response.status} ${response.statusText}`);
-    const wrapper = await response.json();
-    return JSON.parse(wrapper.body)?.list?.map(e => e.sequence).map((seq: any) => ({ ...seq, draft: true })) || [];
+    const data = await response.json();
+    return data?.list?.map((e: any) => e.sequence).map((seq: any) => ({ ...seq, draft: true })) || [];
   } catch (error) {
     console.error('Error fetching OEIS drafts:', error);
     return [];
@@ -228,7 +228,7 @@ export async function getMinorPlanetData() {
   const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQiLSdEB13Ae0xwnPeYOQdzA_V7E1i56knQWkJZdWxfl6m2hcjhm1uJhK2WWMeUh1Y9x8yD0UZgH6kS/pub?output=xlsx';
 
   try {
-    const res = await fetch(csvUrl);
+    const res = await fetchWithTimeout(csvUrl);
     const arrayBuffer = await res.arrayBuffer();
     const workbook = xlsx.read(arrayBuffer, { type: 'array' });
     const sheetName = workbook.SheetNames[workbook.SheetNames.length - 2]; // Assuming data is in the last sheet
@@ -274,7 +274,7 @@ export async function getZooniverseDiscussions(boardId = 6403) {
   };
 
   try {
-    const res = await fetch(url, { headers });
+    const res = await fetchWithTimeout(url, { headers });
     const data = await res.json();
     return data.discussions || [];
   } catch (e) {
@@ -291,7 +291,7 @@ export async function getZooniverseComments(discussionId: string) {
   };
 
   try {
-    const res = await fetch(url, { headers });
+    const res = await fetchWithTimeout(url, { headers });
     const data = await res.json();
     return data.comments || [];
   } catch (e) {
