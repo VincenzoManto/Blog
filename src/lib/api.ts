@@ -1,6 +1,7 @@
 import * as xlsx from 'xlsx';
 import { customSequences } from '../data/oeis-custom';
 import { XMLParser } from 'fast-xml-parser';
+import oeisCache from '../data/oeis-cache.json';
 
 
 const FETCH_TIMEOUT_MS = 10000;
@@ -46,8 +47,8 @@ export async function getOEISData(author = 'Vincenzo Manto') {
 
       return allResults;
     } catch (error) {
-      console.error('Error fetching OEIS data:', error);
-      return [];
+      console.error('Error fetching OEIS data, using cached data:', error);
+      return oeisCache as any[];
     }
   }
 
