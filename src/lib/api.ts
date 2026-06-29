@@ -12,7 +12,7 @@ function fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Respo
 // Fetch OEIS Data
 export async function getOEISData(author = 'Vincenzo Manto') {
   const baseUrl = `https://oeis.org/search?q=author:%22${encodeURIComponent(author)}%22&fmt=json`;
-
+  console.log(`Fetching OEIS data for author: ${author}`);
   async function fetchOeisPage(start: number) {
     const targetUrl = `${baseUrl}&start=${start}`;
     // During build (Node.js), fetch OEIS directly — no CORS proxy needed
@@ -42,6 +42,7 @@ export async function getOEISData(author = 'Vincenzo Manto') {
 
       return allResults;
     } catch (error) {
+      console.error('Error fetching OEIS data:', error);
       return [];
     }
   }
