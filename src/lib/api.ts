@@ -230,16 +230,18 @@ export async function getMinorPlanetData() {
     const res = await fetchWithTimeout(csvUrl);
     const arrayBuffer = await res.arrayBuffer();
     const workbook = xlsx.read(arrayBuffer, { type: 'array' });
-    const sheetName = workbook.SheetNames[workbook.SheetNames.length - 2]; // Assuming data is in the last sheet
-    const sheet = workbook.Sheets[sheetName];
-    const result = xlsx.utils.sheet_to_json(sheet);
-    console.log(workbook.SheetNames)
-    // Filter to only rows where username contains Manto / Vincenzo Manto
-    // (Adjust the field names based on actual headers)
-    const mentions: any[] = result.filter((row: any) => {
-      const user = (row['Username'] || '').toLowerCase();
-      return user.includes('manto') || user.includes('vincenzo');
-    });
+    const sheet1 = workbook.SheetNames.findIndex(e => e === 'May 2026'); 
+    const sheets = workbook.SheetNames.filter((_,i) => i >= sheet1);
+    const mentions: any[] = [];
+    for (const sheetName of sheets) {
+      const sheet = workbook.Sheets[sheetName];
+      const result = xlsx.utils.sheet_to_json(sheet);
+      const sheetMentions: any[] = result.filter((row: any) => {
+        const user = (row['Username'] || '').toLowerCase();
+        return user.includes('manto') || user.includes('vincenzo');
+      });
+      mentions.push(...sheetMentions);
+    }
     const promises = mentions.map(async (mention) => {
       const subjectId = mention['Subject ID'];
       mention['Category'] = explainCategory(mention['Category']);
@@ -256,7 +258,7 @@ export async function getMinorPlanetData() {
         mention['Thumbnails'] = null;
       }
     });
-
+  
     await Promise.all(promises);
     return mentions;
   } catch (e) {

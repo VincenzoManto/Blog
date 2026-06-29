@@ -12,7 +12,7 @@
       var path = l.pathname.replace(base, '');
       var search = l.search || '';
       var hash = l.hash || '';
-      var newUrl = base + '/index.html?redirect=' + encodeURIComponent(path + search + hash);
+      var newUrl = base + '/index.html' //?redirect=' + encodeURIComponent(path + search + hash);
       window.location.replace(newUrl);
     </script>
   </head>
