@@ -17,7 +17,11 @@ export async function getOEISData(author = 'Vincenzo Manto') {
     const targetUrl = `${baseUrl}&start=${start}`;
     // During build (Node.js), fetch OEIS directly — no CORS proxy needed
     const response = await fetchWithTimeout(targetUrl);
-    if (!response.ok) throw new Error(`Error ${start}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Error fetching OEIS data: ${response.status} ${response.statusText}`, errorText);
+      throw new Error(`Error fetching OEIS data: ${response.status} ${response.statusText}`);
+    }
     return response.json();
   }
 
