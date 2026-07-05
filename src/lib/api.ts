@@ -36,6 +36,10 @@ export async function getOEISData(author = 'Vincenzo Manto') {
         const firstPageData = await fetchOeisPage(i++ * 10);
 
         if (firstPageData) {
+          if (firstPageData.some(seq => allResults.some(existingSeq => existingSeq.number === seq.number))) {
+              lastCount = 0;
+              break;
+          }
           allResults = allResults.concat(firstPageData);
           lastCount = firstPageData.length;
         } else {
