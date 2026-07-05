@@ -16,8 +16,11 @@ const { seq, custom } = Astro.props;
 		<h1><a href={`https://oeis.org/A${seq.number}`} target="_blank">{
 			seq.draft ? '[Draft] ' : ''
 		}{custom.name || `A${seq.number}`}</a></h1>
+		<h2>{seq.name}</h2>
 		<p class="meta">Created: {new Date(seq.created).toLocaleDateString()} | Author: {seq.author.replace(/_/g, ' ')}</p>
-		<p style="font-size: 1.15rem; font-weight: bold; font-family: var(--font-serif); color: var(--color-text); margin-top: 0.5rem;">{seq.name}</p>
+		{seq.references ? (<p class="meta">
+		This sequence has been cited by and influenced <b>{seq.references} other sequence{seq.references > 1 ? 's' : ''}</b></p>) : null
+		}
 	</div>
 
 	{
@@ -32,8 +35,8 @@ const { seq, custom } = Astro.props;
 		})
 	}
 
-
-			<p>{seq.comment}</p>
+<h2>Official Comments</h2>
+			<p set:html={seq.comment?.map((c: string) => c.replace(/_(.*?)_/g, '<b>$1</b>').replace(/(A\d+)/g, '<a href="https://oeis.org/$1" target="_blank">$1</a>')).join('<br/>')}></p>
 
 
 		<h2>Sequence Chart</h2>
@@ -69,7 +72,7 @@ const { seq, custom } = Astro.props;
 		)}
 	</>)}	
 	<h2>Cross-References</h2>
-	<p>See also OEIS entries: {seq.xref?.map((xref: string) => <a href={`https://oeis.org/${xref}`} target="_blank">{xref}</a>).reduce((prev: any, curr: any) => [prev, ', ', curr])}</p>
+	<p>See also OEIS entries: {seq.xref?.map((xref: string) => xref?.replace(/\./g, '')?.split(',')?.map((id: string) => <a href={`https://oeis.org/${id?.trim()}`} target="_blank">{id}</a>))?.reduce((prev: any, curr: any) => [prev, ', ', curr])}</p>
 		
 		</div>
 </Layout>

@@ -1,0 +1,284 @@
+---
+layout: '../../layouts/PaperLayout.astro'
+title: "Doxa: A formal swarm multi-agent simulation framework for Economic and Strategic Interaction"
+author: "Vincenzo Manto, Riccardo Dal Cero, Matteo Alessandrini"
+date: "2026-07-02"
+abstract: >
+  When we built Doxa, we wanted to create a simulation framework that could capture the messy reality of human economies. Traditional economic models often assume that systems naturally converge toward equilibrium, but in reality, markets experience panic, information asymmetry, and coordination failures. Doxa abandons these static assumptions in favor of a generative paradigm, where economic structure is generated through decentralized, boundedly rational interaction. By fusing agent-based modeling, market microstructure, and dynamic game theory with the natural-language reasoning of Large Language Models (LLMs), Doxa provides a programmable laboratory where macroeconomic phenomena emerge organically from bottom-up strategic friction.
+keywords:
+  - economics
+  - agent-based modeling
+  - multi-agent systems
+  - simulation
+  - game theory
+---
+
+# Doxa: A formal swarm multi-agent simulation framework for Economic and Strategic Interaction
+
+For decades, computational economics and mechanism design have been bound by an unavoidable computational compromise: to make mathematical models tractable, researchers were forced to assume systems naturally converge toward equilibrium. Classical frameworks heavily rely on rational expectations, representative agents, and Walrasian auctioneers—hypothetical entities that instantly balance supply and demand *ex ante*.
+
+**Doxa** abandons these static assumptions in favor of a generative paradigm:
+
+> **Economic structure is not assumed. It is *generated* through decentralized, boundedly rational interaction.**
+
+By fusing **agent-based modeling (ABM)**, **market microstructure**, and **dynamic game theory** with the natural-language reasoning of **Large Language Models (LLMs)**, Doxa provides a programmable laboratory where macroeconomic phenomena—such as liquidity freezes, price gouging, inflation, and trust networks—emerge organically from bottom-up strategic friction.
+
+---
+
+## A paradigm shift in computational economics
+
+Traditional dynamic stochastic general equilibrium (DSGE) models and classical agent-based simulations struggle to capture the messy reality of human economies. When institutions face sudden shocks, markets rarely transition smoothly from one equilibrium to another; they experience panic, information asymmetry, and coordination failures.
+
+| Feature | Classical Economic Models (DSGE / Walrasian) | Standard Agent-Based Models (ABM) | The Doxa Framework |
+| --- | --- | --- | --- |
+| **Agent Rationality** | Perfect, unbounded utility maximization | Hardcoded heuristic rules | Bounded rationality via LLM inference |
+| **Communication** | None (price signals only) | Simple numerical bidding | Natural-language negotiation and signaling |
+| **Market Clearing** | Instantaneous equilibrium ex ante | Simple matching algorithms | Explicit order books, AMMs, and batch clearing |
+| **Social Structure** | Static or non-existent | Fixed network typologies | Dynamic, event-driven trust and relation graphs |
+| **Scenario Control** | Rigid algebraic system of equations | Code-heavy custom scripting | Declarative YAML domain-specific language |
+
+---
+
+## Formal mathematical architecture
+
+A Doxa simulation is modeled as a discrete-time stochastic game with endogenous network formation. The overarching system is defined by the five-tuple:
+
+$$\mathcal{D} = (\mathcal{A}, \mathcal{R}, \mathcal{M}, \mathcal{E}, \mathcal{T})$$
+
+Where $\mathcal{A}$ represents the finite set of active agents, $\mathcal{R}$ the multi-dimensional resource space, $\mathcal{M}$ the explicit market structures, $\mathcal{E}$ the stochastic event processes, and $\mathcal{T}$ the deterministic state transition operator across discrete time increments $t \in \{0, 1, \dots, T\}$.
+
+### Strategic agent state
+
+Each agent $a \in \mathcal{A}$ is an autonomous decision-making unit defined by the tuple:
+
+$$a = (P_a^t, U_a, \Sigma_a, \mathcal{B}_a^t, \Theta_a)$$
+
+* **Portfolio ($P_a^t \in \mathbb{R}_+^{|\mathcal{R}|}$):** The non-negative vector of physical resources, fiat currencies, and financial instruments held by the agent at time $t$.
+* **Utility Function ($U_a: \mathbb{R}_+^{|\mathcal{R}|} \rightarrow \mathbb{R}$):** The internal valuation metric mapping portfolio states to subjective satisfaction.
+* **Strategy Space ($\Sigma_a$):** The complete action set available to the agent, including order placement, resource transformation (production), and natural-language communication.
+* **Belief State ($\mathcal{B}_a^t$):** The agent's internal memory, historical trade logs, and subjective assessments of other agents' trustworthiness and market volatility.
+* **Behavioral Parameters ($\Theta_a$):** Static or evolving psychological traits, such as risk aversion, negotiation aggressiveness, and time-discounting factors.
+
+### Bounded rationality via LLM policies
+
+In a normative, idealized economic model, an agent attempts to solve an intertemporal expected utility maximization problem subject to feasibility and production constraints:
+
+$$\max_{\sigma_a \in \Sigma_a} \mathbb{E}\left[\sum_{t=0}^T \beta_a^t U_a(P_a^t)\right]$$
+
+In Doxa, **agents do not mathematically solve this equation.** Exact optimization is computationally intractable under incomplete information and unbounded communication spaces. Instead, this maximization serves as a behavioral anchor. The agent's actual decision policy is approximated by an LLM-induced distribution:
+
+$$\sigma_a^t \sim \pi_{\theta}(P_a^t, \mathcal{B}_a^t, \text{context}_t)$$
+
+Where $\pi_{\theta}$ represents the neural weights of a large language model conditioned on the agent's persona, current inventory, and historical interactions. This substitution introduces realistic cognitive artifacts into the simulation:
+
+* **In-Context Path Dependence:** Agents remember past slights and successful trades, altering future strategies without requiring weight fine-tuning.
+* **Heuristic Fallibility:** Like human traders, agents exhibit framing effects, loss aversion, and anchoring biases during price negotiations.
+* **Non-Stationary Tactics:** Strategies evolve organically in response to market regime shifts without requiring hardcoded regime-switching logic.
+
+---
+
+## Engine execution loop
+
+To ensure absolute scientific reproducibility, Doxa decouples the stochastic nature of LLM reasoning from the deterministic physics of the simulation environment. Time advances through an immutable, order-dependent execution cycle.
+
+1. **Maintenance and Constraint Enforcement:** System audits and baseline cost deductions.
+The engine validates all agent portfolios against non-negativity constraints. Baseline survival costs (e.g., metabolic consumption, capital depreciation, or tax liabilities) are automatically deducted from $P_a^t$. Agents failing to meet mandatory survival thresholds face insolvency or default protocols.
+
+
+2. **Agent Cognition and Strategy Formulation:** Parallel LLM inference and action generation.
+Each active agent receives a compiled context prompt containing their current portfolio, market ticker prices, pending messages, and behavioral parameters $\Theta_a$. The engine executes parallel inference across all agents to generate action payloads: limit orders, production requests, and structured communication acts.
+
+
+3. **Market Clearing and Order Execution:** Matching functions and inventory updates.
+Orders generated during the cognition phase are routed to their respective markets $m \in \mathcal{M}$. The matching function $\mathcal{M}: \mathcal{O}_t \rightarrow \text{Trades}_t$ executes compatible bids and asks according to the specified clearing mechanism (e.g., continuous double auction or batch call). Portfolios and cash balances are updated atomically.
+
+
+4. **Exogenous Event Injection:** Stochastic shocks and environmental shifts.
+The event scheduler evaluates the probability space $E_t \sim \mathcal{P}(E \mid S_t)$. If a conditional trigger or macro shock fires—such as a sudden resource discovery, a central bank interest rate hike, or a natural disaster—the global environment state $S_t$ is perturbed accordingly.
+
+
+5. **Belief Updating and Telemetry Logging:** Memory consolidation and metric export.
+Agents receive the outcomes of their actions (e.g., "Order filled at price $\pi$", "Negotiation rejected by Agent B"). These results are summarized and appended to the agent's belief state $\mathcal{B}_a^{t+1}$. Macroeconomic metrics—including allocative efficiency, Gini coefficients, and price volatility—are exported to the simulation time-series ledger.
+
+
+---
+
+## Market microstructure and endogenous social dynamics
+
+A core tenet of Doxa is that prices and trade networks are not macroeconomic primitives; they are microeconomic consequences.
+
+### Explicit market engineering
+
+Markets in Doxa are instantiated as distinct computational entities defined by the tuple:
+
+$$m = (r, c, \pi, \Pi, \kappa)$$
+
+Where $r \in \mathcal{R}$ is the primary traded resource, $c \in \mathcal{R}$ is the numeraire currency, $\pi$ is the current spot price, $\Pi = [\pi_{\min}, \pi_{\max}]$ defines regulatory circuit breakers or price ceilings, and $\kappa$ represents the algorithmic clearing mechanism.
+
+Doxa natively supports three distinct clearing architectures:
+
+1. **Continuous Double Auctions (Limit Order Books):** Asynchronous matching where trades execute immediately whenever a incoming bid exceeds or equals an resting ask.
+2. **Periodic Batch Clearing (Call Auctions):** Orders are accumulated over a discrete time window and cleared simultaneously at a single price that maximizes total traded volume.
+3. **Automated Market Makers (AMMs):** Algorithmic liquidity providers that dynamically adjust buy and sell quotes based on internal inventory imbalances:
+
+$$q^{\text{bid/ask}} = \pi \pm s + \kappa \cdot \text{inventory}$$
+
+Where $s$ is the baseline bid-ask spread and $\kappa$ controls the pricing penalty applied as inventory diverges from equilibrium.
+
+### The dynamic Trust Graph (TG)
+
+Economic transactions in Doxa are moderated by an endogenous social network represented as a directed, weighted graph $G_t = (\mathcal{A}, E_t)$. The directed edge weight $t_{ij}^t \in [0, 1]$ quantifies the level of trust Agent $i$ places in Agent $j$ at time $t$.
+
+Trust is not static; it evolves continuously based on bilateral interaction history:
+
+$$t_{ij}^{t+1} = (1 - \delta)t_{ij}^t + \Delta_{ij}^t$$
+
+Where $\delta \in (0, 1)$ is an exponential decay parameter representing the natural erosion of relationships over time, and $\Delta_{ij}^t$ is the interaction impact delta. When Agent $j$ honors a negotiated agreement or offers favorable trade terms, $\Delta_{ij}^t$ is positive. Conversely, predatory pricing, reneging on contracts, or hostile communication triggers sharp negative penalties.
+
+In Doxa's simulation engine, trust directly influences transaction friction. Agents can programmatically set minimum trust thresholds for credit extensions, refuse to route orders through low-trust counterparties, or form exclusive trading cartels that lock out untrusted competitors.
+
+---
+
+## A case study: Bilateral Production Economy (BPE)
+
+To observe how complex macroeconomic structures emerge from simple generative rules, consider a minimal general equilibrium scenario implemented in Doxa: a two-agent bilateral economy experiencing an exogenous supply shock.
+
+### System setup
+
+The scenario consists of two agents with complementary production capabilities and distinct resource endowments:
+
+* **Agent A (The Agrarian):** Equipped with the production function $f_{\text{agro}}(\text{Gold}) = 4 \cdot \text{Corn}$. Agent A requires Gold as a catalytic input to generate food.
+* **Agent B (The Artisan):** Equipped with the production function $f_{\text{art}}(\text{Corn}) = 1 \cdot \text{Gold}$. Agent B consumes Corn to fuel labor that extracts and refines Gold.
+
+Neither agent can survive independently; without Agent A's Corn, Agent B starves and ceases Gold production. Without Agent B's Gold, Agent A cannot initiate crop cycles. In a baseline environment, the two agents quickly establish a stable terms-of-trade ratio—typically hovering near $1 \text{ Gold} = 4 \text{ Corn}$—and maintain high mutual trust ($t_{AB} \approx 0.85$).
+
+```
++-----------------------------------------------------------------+
+|                         BASELINE REGIME                         |
+|  Agent A (Agrarian) <=== [1 Gold  for 4 Corn] ===> Agent B      |
+|  Trust: High (0.85)     Price: Stable (0.25 Gold/Corn)          |
++-----------------------------------------------------------------+
+                                 |
+                                 |  Step 30: Drought Shock (50% Corn Loss)
+                                 v
++-----------------------------------------------------------------+
+|                        CRISIS & EMERGENCE                       |
+|  1. Scarcity: Corn supply collapses -> Agrarian raises ask price|
+|  2. Inflation: Spot price surges from 0.25 to 0.60 Gold/Corn    |
+|  3. Friction: Artisan perceives price gouging -> Trust drops    |
+|  4. Adaptation: Artisan hoards Gold -> Liquidity freeze threatens|
++-----------------------------------------------------------------+
+
+```
+
+### The emergence of inflation and liquidity freezes
+
+At simulation step $t = 30$, the event scheduler injects an exogenous environmental shock: a severe drought that instantly destroys $50\%$ of Agent A's existing Corn inventory and halves their production efficiency for the next 10 time steps.
+
+Without any hardcoded instructions on how to handle inflation or crises, the system exhibits striking emergent dynamics:
+
+1. **Scarcity Recognition and Price Surges:** Upon processing the inventory loss during their cognition phase, Agent A recognizes an acute supply deficit. Utilizing natural language negotiation, Agent A messages Agent B: *"Due to severe crop failures, I can no longer offer 4 Corn per Gold. My new clearing price is 2 Corn per Gold to cover survival overhead."*
+2. **Bargaining Power Shifts:** Agent B, facing imminent caloric depletion, is forced to accept the higher price on the limit order book. The spot price of Corn spikes by $100\%$, generating instant cost-push inflation across the micro-economy.
+3. **Trust Degradation and Retaliation:** Because Agent B's LLM policy interprets the sudden price increase as predatory exploitation rather than pure cost-passing, the internal sentiment analysis triggers a negative interaction delta ($\Delta_{BA} = -0.30$). Trust drops precipitously.
+4. **Defensive Hoarding:** In subsequent steps, a distrustful Agent B alters their strategy. Instead of immediately trading their newly refined Gold, Agent B begins hoarding liquidity to build a buffer against future price hikes. This hoarding reduces Gold velocity, triggering a secondary liquidity crunch that threatens to halt Agent A's production cycle entirely.
+
+This entire sequence—from supply shock to inflation, social friction, and monetary contraction—unfolds purely from the local interactions of LLM-driven agents optimizing their utility under bounded rationality.
+
+---
+
+## Configuration with YAML
+
+A critical failure mode of many multi-agent frameworks is code entanglement, where scenario assumptions are buried deep within imperative programming scripts. Doxa eliminates this by isolating the simulation engine from scenario design using a human-readable **YAML Domain-Specific Language (DSL)**.
+
+Researchers define the entire initial state $\mathcal{S} = (\mathcal{R}, \mathcal{A}, \mathcal{M}, \mathcal{E})$ in a declarative file. Because the underlying execution engine is strictly deterministic, running the same YAML file with the same random seed guarantees bit-exact replication of experimental trajectories.
+
+```yaml
+# Doxa Simulation Specification: Bilateral Drought Crisis
+simulation:
+  name: "bilateral_drought_v1"
+  time_steps: 60
+  random_seed: 1048576
+  log_level: "TELEMETRY_FULL"
+
+resources:
+  - id: "gold"
+    properties: { durable: true, divisibility: 0.01 }
+  - id: "corn"
+    properties: { durable: false, decay_rate: 0.05, divisibility: 1.0 }
+
+markets:
+  - id: "commodity_exchange"
+    resource: "corn"
+    numeraire: "gold"
+    mechanism: "continuous_double_auction"
+    fee_structure: { maker: 0.0, taker: 0.005 }
+    price_bounds: [0.05, 5.00]
+
+agents:
+  - id: "agrarian_alpha"
+    engine: "gpt-4o-economic-v2"
+    initial_portfolio: { gold: 10.00, corn: 80.0 }
+    production_functions:
+      - id: "cultivation"
+        inputs: { gold: 1.00 }
+        outputs: { corn: 4.0 }
+        labor_cost: 2.0
+    behavioral_parameters:
+      target_inventory: { corn: 20.0 }
+      risk_aversion: 0.65
+      negotiation_stance: "protective_margin"
+    initial_beliefs:
+      trust_weights: { "artisan_beta": 0.85 }
+
+  - id: "artisan_beta"
+    engine: "gpt-4o-economic-v2"
+    initial_portfolio: { gold: 25.00, corn: 15.0 }
+    production_functions:
+      - id: "refinement"
+        inputs: { corn: 4.0 }
+        outputs: { gold: 1.00 }
+        labor_cost: 1.5
+    behavioral_parameters:
+      target_inventory: { gold: 10.00 }
+      risk_aversion: 0.40
+      negotiation_stance: "opportunistic"
+    initial_beliefs:
+      trust_weights: { "agrarian_alpha": 0.85 }
+
+events:
+  - id: "environmental_drought"
+    type: "exogenous_shock"
+    trigger_step: 30
+    target_agent: "agrarian_alpha"
+    mutations:
+      portfolio_modifiers: { corn: "* 0.50" }
+      production_modifiers: { "cultivation.outputs.corn": "* 0.50" }
+    duration: 10
+    broadcast_message: "A severe drought scorches the eastern farmlands."
+
+```
+
+---
+
+## Research applications and Doxa's future 
+
+Doxa provides a scalable foundation for academic and industrial research across multiple domains:
+
+* **AI Safety and Emergent Alignment:** Stress-testing how autonomous AI agents behave when placed in resource-constrained environments with competing objectives.
+* **Algorithmic Policy Design:** Central banks and regulatory bodies can simulate the distributional impacts of tax reforms, interest rate adjustments, or universal basic income (UBI) proposals across heterogeneous populations before real-world deployment.
+* **Decentralized Finance (DeFi) Stress Testing:** Simulating adversarial attacks, liquidity cascades, and automated liquidation spirals on novel automated market maker architectures.
+
+### Future architectural evolution
+
+The active Doxa development roadmap focuses on scaling computational depth and analytical rigor:
+
+1. **Hybrid LLM-RL Cognition:** Integrating Reinforcement Learning (RL) value heads directly with LLM policies. While LLMs handle zero-shot negotiation and natural-language signaling, RL value functions will drive high-frequency numerical bidding and long-term portfolio optimization:
+
+$$\pi_a = \lambda \pi_{\text{LLM}} + (1 - \lambda)\pi_{\text{RL}}$$
+
+2. **Automated Mechanism Design Layer:** Deploying meta-agents that perturb market clearing rules $\kappa$ and tax schedules in real time to optimize global welfare functions or minimize income inequality:
+
+$$\max_{\kappa} \; \text{Efficiency}(\kappa) - \gamma \cdot \text{Gini}(\mathcal{A})$$
+
+3. **Massive Distributed Simulation:** Architecting asynchronous state-synchronization engines capable of scaling simulations from tens of agents to over $10^5$ concurrent LLM-driven entities, opening the door to city-scale digital twins and macroeconomic forecasting.
+

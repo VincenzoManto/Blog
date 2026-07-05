@@ -6,25 +6,25 @@ import Layout from '../layouts/Layout.astro';
        <section>
 	       <h2>About</h2>
 	       <p>
-		       A long catalog of mathematical, astronomical, and epistemological content. Some of it comes from the OEIS and Zooniverse projects. Things I do for fun, where boredom hits and I want to take a break from <a href="https://datastripes.com" target="_blank">Datastripes</a> and my work as Chief Software Engineer.
+		       A long catalog of mathematical, astronomical and epistemological content. Some of it comes from the OEIS and Zooniverse projects. Things I do for fun, where boredom hits and I want to take a break from <a href="https://datastripes.com" target="_blank">Datastripes</a> and my work as Chief Software Engineer.
 	       </p>
        </section>
 
        <section style="margin-top: 3rem;">
 	       <h2>Explore Sections</h2>
 	       <div class="card" style="margin-top: 1rem;">
-		       <h3><a href={import.meta.env.BASE_URL + 'math'}>Mathematics (OEIS)</a></h3>
-		       <p>Explore integer sequences authored or co-authored in the On-Line Encyclopedia of Integer Sequences.</p>
+		       <h3><a href={import.meta.env.BASE_URL + 'math'}>Mathematics</a></h3>
+		       <p>A set of mathematical explorations, including official peer-reviewed contributions to the OEIS.</p>
 	       </div>
 
 	       <div class="card">
 		       <h3><a href={import.meta.env.BASE_URL + 'astronomy'}>Astronomy</a></h3>
-		       <p>Daily minor planet discoveries, discussions, and Zooniverse contributions.</p>
+		       <p>Explorations and observations in the field of astronomy, including contributions to asteroid discoveries.</p>
 	       </div>
 
 	       <div class="card">
 		       <h3><a href={import.meta.env.BASE_URL + 'articles'}>Papers & Articles</a></h3>
-		       <p>In-depth considerations, epistemological essays, and academic papers.</p>
+		       <p>In-depth considerations, epistemological essays and academic papers.</p>
 	       </div>
        </section>
 </Layout>

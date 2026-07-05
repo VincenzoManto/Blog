@@ -24,13 +24,13 @@ const last = data[data.length - 1];
   </p>
 
   <div>
-    {data.map(({seq,custom}) => (
+    {data.sort((a, b) => new Date(b.seq.created).getTime() - new Date(a.seq.created).getTime()).map(({seq,custom}) => (
       <div class="card">
-        <h3 style="margin-bottom: 0.5rem;"><a href={`${import.meta.env.BASE_URL}math/oeis/A${seq.number}`}>
+        <h3 style="margin-bottom: 0.5rem;"><a href={`${import.meta.env.BASE_URL}math/oeis/A${seq.number}/`}>
 		{seq.draft ? '[Draft] ' : ''}
 		{custom?.name} A{seq.number}</a>: {seq.name}</h3>
         <p class="meta">Created: {new Date(seq.created).toLocaleDateString()} | Author: {seq.author.replace(/_/g, ' ')}</p>
-        <p class="meta"><strong>Cited by:</strong> {seq.xref?.length || 0} sequences</p>
+        {seq.references ? (<p class="meta"><strong>Cited by:</strong> {seq.references} sequences</p>) : null}
       </div>
     ))}
 
