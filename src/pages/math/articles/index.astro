@@ -1,0 +1,37 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { renderInlineMarkdown } from '../../../lib/markdown';
+
+const allArticles = Object.values(import.meta.glob('../../articles/*.mdx', { eager: true }));
+const mathArticles = allArticles.filter((article: any) =>
+	(article.frontmatter.keywords || []).some((k: string) => k.toLowerCase() === 'math')
+);
+const sortedArticles = mathArticles.sort((a: any, b: any) => {
+	const dateA = new Date(a.frontmatter.date || 0);
+	const dateB = new Date(b.frontmatter.date || 0);
+	return dateB.getTime() - dateA.getTime();
+});
+---
+
+<Layout title="Math Papers">
+	<h2>Math Papers</h2>
+
+	<div style="margin-top: 2rem;">
+		{sortedArticles.length > 0 ? (
+			sortedArticles.map((article: any) => (
+				<div class="card">
+					<h3><a href={article.url}>{article.frontmatter.title}</a></h3>
+					<p class="meta">
+						Date: {new Date(article.frontmatter.date).toLocaleDateString()}
+						{article.frontmatter.doi && ` | DOI: ${article.frontmatter.doi}`}
+					</p>
+					{article.frontmatter.abstract && (
+						<p set:html={renderInlineMarkdown(article.frontmatter.abstract)} />
+					)}
+				</div>
+			))
+		) : (
+			<p>No math papers found yet.</p>
+		)}
+	</div>
+</Layout>

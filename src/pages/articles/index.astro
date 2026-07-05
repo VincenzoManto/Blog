@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getPapers } from '../../lib/api';
+import { renderInlineMarkdown } from '../../lib/markdown';
 
 const externalPapers = await getPapers();
 // Fetch all markdown files in the pages/articles folder
@@ -16,19 +17,27 @@ const sortedArticles = allArticles.sort((a, b) => {
 
 <Layout title="Papers & Articles">
 	<h2>Papers & Articles</h2>
+	<p>
+	Here some of the papers and articles I think are worth mentioning. They cover a range of topics in mathematics, computer science, and related fields. 
+	I'm honored to have co-authored several papers with esteemed colleagues like {[...new Set(sortedArticles.map(article => article.frontmatter.author?.split(',') || []).flat())].filter(e => e.trim() !== 'Vincenzo Manto').join(', ')}.
+	</p>
 	
 	<div style="margin-top: 2rem;">
 		{sortedArticles.length > 0 ? (
 			sortedArticles.map((article) => (
 				<div class="card">
 					<h3><a href={article.url}>{article.frontmatter.title}</a></h3>
-					<p class="meta">
-						Date: {new Date(article.frontmatter.date).toLocaleDateString()}
-						{article.frontmatter.doi && ` | DOI: ${article.frontmatter.doi}`}
-					</p>
+					<div class="meta grid">
+						<span>Date: {new Date(article.frontmatter.date).toLocaleDateString()}</span>
+						<span>{article.frontmatter.author && `Author: ${article.frontmatter.author}`}</span>
+						<span>{article.frontmatter.doi && `DOI: ${article.frontmatter.doi}`}</span>
+					</div>
 					{article.frontmatter.abstract && (
-						<p>{article.frontmatter.abstract}</p>
+						<p set:html={renderInlineMarkdown(article.frontmatter.abstract)} />
 					)}
+					{article.frontmatter.keywords?.map((keyword) => (
+						<span class="keyword">{keyword}</span>
+					))}
 				</div>
 			))
 		) : (

@@ -1,6 +1,8 @@
 ---
 import Layout from './Layout.astro';
 const { frontmatter } = Astro.props;
+import { renderInlineMarkdown } from '../lib/markdown';
+
 ---
 
 <Layout title={frontmatter.title}>
@@ -18,16 +20,27 @@ const { frontmatter } = Astro.props;
 			<td><strong>Date:</strong></td>
 			<td><time>{new Date(frontmatter.date).toLocaleDateString()}</time></td>
 		</tr>
-		<tr>
+		{frontmatter.link && (
+			<tr>
 			<td><strong>Link:</strong></td>
 			<td><a href={frontmatter.link} target="_blank">{frontmatter.link}</a></td>
 		</tr>
+		)}
+		{frontmatter.keywords && (
+			<tr>
+				<td><strong>Keywords:</strong></td>
+				<td>{frontmatter.keywords.map((keyword) => (
+					<span class="keyword">{keyword}</span>
+				))}</td>
+			</tr>
+		)}
 		{frontmatter.doi && (
 			<tr>
 				<td><strong>DOI:</strong></td>
 				<td><a href={`https://doi.org/${frontmatter.doi}`} target="_blank">{frontmatter.doi}</a></td>
 			</tr>
 		)}
+		
 	</table>
 		<header style="text-align: center; margin-bottom: 2rem; border-bottom: none;">
 			<h1 style="width: 100%;     text-align: center;margin-bottom: 40px;border-bottom: 2px solid #000;padding-bottom: 10px;" >{frontmatter.title}</h1>
@@ -36,7 +49,8 @@ const { frontmatter } = Astro.props;
 		
 		{frontmatter.abstract && (
 			<div class="paper-abstract">
-				<strong>Abstract:</strong> {frontmatter.abstract}
+				<strong>Abstract:</strong> 
+						<p set:html={renderInlineMarkdown(frontmatter.abstract)} />
 			</div>
 		)}
 
