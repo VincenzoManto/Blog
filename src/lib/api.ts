@@ -2,6 +2,7 @@ import * as xlsx from 'xlsx';
 import { customSequences } from '../data/oeis-custom';
 import { XMLParser } from 'fast-xml-parser';
 import oeisCache from '../data/oeis-cache.json';
+import fs from 'fs';
 
 
 const FETCH_TIMEOUT_MS = 10000;
@@ -13,17 +14,16 @@ function fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Respo
 // Fetch OEIS Data
 export async function getOEISData(author = 'Vincenzo Manto') {
   const baseUrl = `https://oeis.org/search?q=author:%22${encodeURIComponent(author)}%22&fmt=json`;
-  console.log(`Fetching OEIS data for author: ${author}`);
   async function fetchOeisPage(start: number) {
-    const targetUrl = `${baseUrl}&start=${start}`;
-    // During build (Node.js), fetch OEIS directly — no CORS proxy needed
+    const targetUrl = `https://cors.io/?url=${encodeURIComponent(`${baseUrl}&start=${start}`)}`;
     const response = await fetchWithTimeout(targetUrl);
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`Error fetching OEIS data: ${response.status} ${response.statusText}`, errorText);
       throw new Error(`Error fetching OEIS data: ${response.status} ${response.statusText}`);
     }
-    return response.json();
+    const data = await response.json();
+    return JSON.parse(data.body);
   }
 
   async function loadAllSequences() {
@@ -36,7 +36,7 @@ export async function getOEISData(author = 'Vincenzo Manto') {
         const firstPageData = await fetchOeisPage(i++ * 10);
 
         if (firstPageData) {
-          if (firstPageData.some(seq => allResults.some(existingSeq => existingSeq.number === seq.number))) {
+          if (firstPageData?.some(seq => allResults.some(existingSeq => existingSeq.number === seq.number))) {
               lastCount = 0;
               break;
           }
@@ -49,6 +49,13 @@ export async function getOEISData(author = 'Vincenzo Manto') {
         if (lastCount < 10) break;
       } while (true);
 
+      // Cache the results to a local JSON file for future use
+      try {
+        fs.writeFileSync('src/data/oeis-cache.json', JSON.stringify(allResults, null, 2));
+        console.log('OEIS data cached successfully.');
+      } catch (writeError) {
+        console.error('Error writing OEIS cache file:', writeError);
+      }
       return allResults;
     } catch (error) {
       console.error('Error fetching OEIS data, using cached data:', error);
@@ -218,7 +225,7 @@ export async function getOEISDataFull() {
 }
 
 export async function getDraftOEISData(author = 'Vincenzo Manto') {
-  const baseUrl = `https://oeis.org/draft?user=${encodeURIComponent(author)}&fmt=json`;
+  const baseUrl = `https://cors.io/?url=https://oeis.org/draft?user=${encodeURIComponent(author)}&fmt=json`;
 
   try {
     const response = await fetchWithTimeout(baseUrl);
