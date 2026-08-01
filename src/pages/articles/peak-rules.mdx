@@ -1,0 +1,47 @@
+---
+layout: '../../layouts/PaperLayout.astro'
+title: "When Everything Returns to the Starting Point, We Forget the Path"
+subtitle: "Peak-end rule, break-even effect, and a testable question about path shape"
+version: "0.1"
+author: "Vincenzo Manto"
+date: "2026-08-01"
+abstract: "When an investment, after a sharp drawdown, returns exactly to its starting value, net return is zero — yet the episode doesn't feel like nothing happened. This essay names the pattern 'path amnesia' or 'round-trip discount': the tendency to discount the risk information carried by the path when start and end points coincide. It situates the observation against Kahneman's peak-end rule and Thaler and Johnson's break-even effect, then isolates a narrower, testable question left open by the existing literature: at equal integrated historical variance, does the shape of a drawdown path (a single deep V versus two shallower W-shaped dips) change subsequent risk-taking behavior — and does the effect hold even for a neutral observer who never lived the loss firsthand?"
+keywords:
+  - Behavioral Finance
+  - Risk Perception
+  - Peak-End Rule
+  - Break-Even Effect
+---
+
+# When everything returns to the starting point, we usually forget what happened
+
+A few weeks ago I found myself staring at a price chart on Fineco that, after a deep drawdown, had returned exactly to its starting point. Net return, obviously, zero. Yet the feeling that chart conveyed was nowhere near "nothing happened." That's where a simple question was born, shared with economist friends, which I'm passing along here more as the usual discussion prompt than anything else.
+
+## Observation
+
+When an investment, after a phase of strong volatility, returns to its starting value, we tend to treat it as a non-event. The account is back to even, so we file the episode away without recalibrating our perception of the risk actually run. The problem is that between point A and point B there wasn't silence: there was a drawdown, maybe painful, maybe only watched from outside. That path carries information — about the instrument's volatility, about our emotional resilience, about the quality of the decision that allowed us to stay invested — which risks being lost the moment the two endpoints coincide.
+
+I've tried giving this pattern a provisional name: **path amnesia**, or if you prefer a more direct label, **round-trip discount**: the tendency to systematically discount the risk information contained in the path when the endpoint coincides with the starting point.
+
+## A bit of SOTA
+
+I've always hated doing the SOTA recap, but it's important to be honest here, because it's easy to mistake for original something cognitive psychology has already mapped out, with more rigor than I could improvise here.
+
+I found two references in particular that cover much of the ground:
+
+- Kahneman and colleagues' peak-end rule shows we retrospectively evaluate an experience based on its peak (positive or negative) and its final point, not the integral of the path. A deep drawdown followed by a return to zero is, in a sense, exactly the pattern this heuristic predicts.
+- The break-even effect, described by Thaler and Johnson in 1990 (the well-known "gambling with the house money"), shows that after a loss sequence followed by recovery, people become more risk-seeking precisely out of a desire to get back to even.
+
+Taken together, these two strands already explain a good part of what I was observing. So it's not correct to present the idea as a brand-new bias. I say this explicitly because I believe the most useful part of an exercise like this isn't inventing a label, but precisely locating where the existing literature ends and where, maybe, something worth checking empirically begins.
+
+The margin, if there is one, isn't in the underestimation of perceived risk itself but in a narrower, more operational question: **at equal integrated historical variance, does the shape of the path change subsequent behavior — specifically, the size with which one re-enters a position?**
+
+Put differently: two paths with the same aggregate volatility but different shape — a single deep drawdown (V-shaped) versus two shallower drawdowns (W-shaped) — do they produce the same re-entry sizing, or does shape matter more than raw variance? And does the effect hold even for someone who observes the chart from outside, without having lived the loss firsthand, which would rule out the motivational explanation of the break-even effect and leave a purely perceptual component?
+
+If the answer to that last question were yes, we'd have isolated something more specific than peak-end and break-even combined: not just "we evaluate the experience based on its extremes" and not just "whoever lost is more willing to risk it to make up for it," but "the shape of the path itself, independent of direct emotional experience, alters subsequent risk estimation even in a neutral observer." It's an incremental contribution, not a revolution, but it could have a concrete practical application in communicating risk to retail investors.
+
+## How to test it
+
+Before thinking about a controlled experiment with subjects, which requires time and a clean design, the cheaper route is to look at real market data already available: retail flows, ETF positioning, sentiment data, comparing subsequent behavior after V-shaped patterns versus flat patterns with similar net return. If there's a signal, it'll show up there before any questionnaire gets built.
+
+I don't think I've found a new bias — the research I did before writing this convinced me of the opposite, again and again — but the exercise of separating what's already known from what remains open is, in itself, useful. If anyone has already seen a study that specifically isolates the effect of path shape at constant variance, I'd be glad to know. Otherwise, it remains a modest hypothesis, testable with data that already exists, and perhaps not entirely without interest for those working in financial risk communication.

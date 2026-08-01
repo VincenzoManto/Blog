@@ -1,0 +1,68 @@
+---
+layout: '../../layouts/PaperLayout.astro'
+title: "The Gold of Fools: Why Searching Makes You See Treasure Everywhere"
+subtitle: "How the act of looking lowers your threshold for what counts as a match"
+version: "0.1"
+author: "Vincenzo Manto"
+date: "2026-07-29"
+abstract: "Why does a piece of concrete briefly look like a fossil once you've spent an hour searching for real ones? This essay uses Signal Detection Theory and Bruner and Postman's concept of the perceptual set to explain a common experience of searchers of all kinds — for fossils, mushrooms, minerals, parking spots, or lost keys. The core claim: active search does not sharpen your ability to discriminate a true signal from noise, it lowers your acceptance criterion for what counts as a plausible candidate. A simple, non-validated formal sketch is proposed for how this criterion shifts with search intensity and perceptual distance from the target, yielding three testable predictions about search behavior."
+keywords:
+  - Perception
+  - Signal Detection Theory
+  - Cognitive Psychology
+  - Attention
+---
+
+# Why during a search I see treasure everywhere
+
+The idea came to me while hunting for fossils, first at Maddalusa and then at Giazza. After a while spent scanning the rock, every streak, every irregular fracture, every stone with a slightly elongated shape began to look like an ammonite. Almost all of them, of course, were just stones. But for an instant, before being discarded, each one had had a chance.
+
+This isn't a discovery, just an observation that anyone who has searched for mushrooms, minerals, a parking spot will recognize: at some point, everything starts to resemble what you're looking for. A piece of frosted glass looks like quartz. A tile catches the light and for a moment it's gold. An ordinary stone has "that shape." The mechanism behind it concerns how the mind, when actively engaged in a search, lowers its guard on what counts as "similar enough" to deserve attention.
+
+## I think: it's not that you see better, rather you accept less
+
+The intuitive mistake is to think that searching for something makes you better at recognizing it. I believe what actually happens is the opposite, or rather: something more subtle happens. Your ability to distinguish real gold from pyrite doesn't change. What changes is how much you're willing to accept as a "plausible candidate" before discarding it.
+
+This distinction, between *sensitivity* (how good you are at discriminating) and *criterion* (how permissive you are in accepting a match), sits at the heart of Signal Detection Theory, a framework born in the 1950s in radar and psychophysics and since applied to nearly every domain where a true signal must be distinguished from noise. When you're in active-search mode, the criterion drops. You don't see minerals better: you accept lower similarity thresholds for saying "yes, that could be it."
+
+There's an even older precedent: in the 1940s, Bruner and Postman showed that an active mental state predisposes the perceptual system to interpret ambiguous stimuli in line with current expectation — the so-called *perceptual set*. This isn't generic pareidolia (seeing faces in clouds, which happens to everyone, always). It's a task-conditioned pareidolia: it only happens while you're inside the search.
+
+## My attempt
+
+I'm not a researcher in cognitive psychology (even if my girlfriend is), so what follows is a napkin sketch to clarify my own thinking, not a validated model.
+
+If the point is that the criterion drops, then that's what belongs in the formula, not some generic "perceived value." Call c(t) the similarity threshold beyond which a stimulus x is accepted as a "plausible candidate" (worth checking up close), where t is the time elapsed in the search session. The idea is:
+
+$$c(t) = c₀ − I(t) · e^(−λ·d(x,T))$$
+
+where:
+- c₀ is the "resting" threshold, the one I use outside any search (a stone is a stone, I don't pick it up);
+- d(x,T) is the perceptual distance between the stimulus x and what I'm searching for, the target T (a real ammonite has d = 0, an ordinary stone has a large d);
+- I(t) represents the intensity of the search state at that moment, how much the mind is "in hunting mode";
+- λ governs how quickly the effect fades as one moves away from the target.
+
+The more a stimulus resembles what I'm looking for (small d), the lower the threshold drops, and the easier it becomes for that stone to clear the threshold and get picked up, turned over, checked. This decay with distance is an idea borrowed from Shepard (1987), who first showed that perceptual generalization tends to follow precisely this exponential shape.
+
+I(t) is the intuition, walking among the rocks, is that it isn't constant: it grows the longer you search without finding anything (a bit like a slot machine — intermittent reinforcement keeps attention high), and then collapses quickly as soon as you stop searching, head home, disengage from "hunting" mode. Something like:
+
+$I(t) = α · (1 − e^(−β·t))$ during the search
+
+which rises slowly, followed by a much faster return once the session ends. It isn't the stimulus's rating that rises, it's my acceptance threshold that falls: no ammonite looks more beautiful to me merely because I'm searching for it — it's just that I accept checking ever less similar ones.
+
+## Three Things That Can Be Predicted
+
+If the mechanism is as described, a systematic lowering of the criterion driven by the search state, then the formula yields precise, testable predictions, not just an intuition:
+
+**1. The more a stimulus perceptually resembles the target, the more likely it is to clear the threshold and get picked up or closely inspected.** A glinting piece of glass deceives more easily than a dull stone. This probability should decay as one moves, perceptually, away from the sought-after prototype.
+
+**2. The stronger the drive to search, the lower the threshold falls.** Someone searching urgently (because time is short, because the stakes are high) should accept as candidates stimuli progressively farther from the target, compared to someone searching in a relaxed way.
+
+**3. The threshold falls over time and rises quickly once the search ends.** The longer you search without finding anything, the more the criterion loosens (an intermittent-reinforcement mechanism, the same one that keeps people glued to slot machines). But the moment the search ends, mentally exiting the mode, the threshold should rise back rapidly — much more rapidly than it fell.
+
+This third prediction is probably the most interesting one, because none of the classic explanations (generic pareidolia, category priming) generate it in this specific shape: a threshold that falls slowly during the session, and rises rapidly the instant the session ends.
+
+The underlying mechanism isn't mine, and it isn't even new. Signal Detection Theory has existed for seventy years. Bruner and Postman's perceptual set, for eighty. I haven't discovered anything not already written in the literature, and the formulas above are more an exercise in personal clarity than a scientific contribution.
+
+What I take home from Maddalusa and Giazza isn't a discovery, but the direct confirmation, hands in the dirt, of something psychologists have known for decades: searching for something doesn't just make you more attentive, it also makes you more willing to fool yourself. Every fossil, mushroom, or mineral hunter already knows this instinctively, without needing an equation.
+
+Next time a piece of concrete briefly looks like a fossil to you, it isn't a flaw in your perception. It's just the small, harmless price of searching for something with enough eagerness to find it.
