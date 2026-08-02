@@ -13,19 +13,33 @@ const sortedArticles = allArticles.sort((a, b) => {
     const dateB = new Date(b.frontmatter.date || 0);
     return dateB.getTime() - dateA.getTime();
 });
+
+// NOTE: this site is statically prerendered (output: 'static'), so a single
+// build of this page is served regardless of query string. Filtering by
+// ?search=<tag> therefore happens client-side (see <script> below), not here.
 ---
 
 <Layout title="Papers & Articles">
 	<h2>Papers & Articles</h2>
 	<p>
-	Here some of the papers and articles I think are worth mentioning. They cover a range of topics in mathematics, computer science, and related fields. 
+	Here some of the papers and articles I think are worth mentioning. They cover a range of topics in mathematics, computer science, and related fields.
 	I'm honored to have co-authored several papers with esteemed colleagues like {[...new Set(sortedArticles.map(article => article.frontmatter.author?.split(',') || []).flat())].filter(e => e.trim() !== 'Vincenzo Manto').join(', ')}.
 	</p>
-	
-	<div style="margin-top: 2rem;">
+
+	<p class="active-filter" id="active-filter" hidden>
+		Filtering by tag: <strong id="active-filter-tag"></strong>
+		<a href="#" class="clear-filter" id="clear-filter">clear ✕</a>
+	</p>
+
+	<div style="margin-top: 2rem;" id="articles-list">
 		{sortedArticles.length > 0 ? (
 			sortedArticles.map((article) => (
-				<div class="card">
+				<div
+					class="card"
+					data-article-id={article.url}
+					data-keywords={(article.frontmatter.keywords || []).map((k) => k.toLowerCase()).join('|')}
+				>
+					<button type="button" class="star-toggle" data-article-id={article.url} aria-label="Toggle favorite" title="Toggle favorite">☆</button>
 					<h3><a href={article.url}>{article.frontmatter.title}</a></h3>
 					<div class="meta grid">
 						<span>Date: {new Date(article.frontmatter.date).toLocaleDateString()}</span>
@@ -36,7 +50,7 @@ const sortedArticles = allArticles.sort((a, b) => {
 						<p set:html={renderInlineMarkdown(article.frontmatter.abstract)} />
 					)}
 					{article.frontmatter.keywords?.map((keyword) => (
-						<span class="keyword">{keyword}</span>
+						<a class="keyword" href={`?search=${encodeURIComponent(keyword)}`}>{keyword}</a>
 					))}
 				</div>
 			))
@@ -44,4 +58,125 @@ const sortedArticles = allArticles.sort((a, b) => {
 			<p>No articles found. Add MDX files to the src/pages/articles directory.</p>
 		)}
 	</div>
+	<p id="no-match-message" hidden>No articles found matching this filter.</p>
 </Layout>
+
+<style>
+	.active-filter {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.clear-filter {
+		font-size: 0.85em;
+	}
+	.card {
+		position: relative;
+	}
+	.star-toggle {
+		position: absolute;
+		top: 0;
+		right: 0;
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-size: 1.4rem;
+		line-height: 1;
+		color: var(--color-text-light);
+		padding: 0.2rem;
+	}
+	.star-toggle.starred {
+		color: #f5b700;
+	}
+	.card.starred {
+		border-color: #f5b700;
+	}
+</style>
+
+<script>
+	const STORAGE_KEY = 'starredArticles';
+
+	function getStarred(): string[] {
+		try {
+			return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+		} catch {
+			return [];
+		}
+	}
+
+	function setStarred(ids: string[]) {
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+	}
+
+	function applyStarredState() {
+		const starred = getStarred();
+		const list = document.getElementById('articles-list');
+		if (!list) return;
+
+		document.querySelectorAll<HTMLButtonElement>('.star-toggle').forEach((button) => {
+			const id = button.dataset.articleId;
+			const isStarred = !!id && starred.includes(id);
+			button.textContent = isStarred ? '★' : '☆';
+			button.classList.toggle('starred', isStarred);
+			button.closest('.card')?.classList.toggle('starred', isStarred);
+		});
+
+		const cards = Array.from(list.querySelectorAll<HTMLElement>('.card'));
+		cards
+			.sort((a, b) => {
+				const aStarred = starred.includes(a.dataset.articleId || '') ? 1 : 0;
+				const bStarred = starred.includes(b.dataset.articleId || '') ? 1 : 0;
+				return bStarred - aStarred;
+			})
+			.forEach((card) => list.appendChild(card));
+	}
+
+	document.addEventListener('click', (event) => {
+		const button = (event.target as HTMLElement)?.closest<HTMLButtonElement>('.star-toggle');
+		if (!button || !button.dataset.articleId) return;
+
+		const id = button.dataset.articleId;
+		const starred = getStarred();
+		const next = starred.includes(id) ? starred.filter((s) => s !== id) : [...starred, id];
+		setStarred(next);
+		applyStarredState();
+	});
+
+	function applyTagFilter() {
+		const tag = new URLSearchParams(window.location.search).get('search');
+		const banner = document.getElementById('active-filter');
+		const bannerTag = document.getElementById('active-filter-tag');
+		const noMatch = document.getElementById('no-match-message');
+		const cards = Array.from(document.querySelectorAll<HTMLElement>('#articles-list .card'));
+
+		if (!tag) {
+			banner?.setAttribute('hidden', '');
+			cards.forEach((card) => card.removeAttribute('hidden'));
+			noMatch?.setAttribute('hidden', '');
+			return;
+		}
+
+		if (banner && bannerTag) {
+			bannerTag.textContent = tag;
+			banner.removeAttribute('hidden');
+		}
+
+		const needle = tag.toLowerCase();
+		let anyVisible = false;
+		cards.forEach((card) => {
+			const keywords = (card.dataset.keywords || '').split('|');
+			const matches = keywords.includes(needle);
+			card.toggleAttribute('hidden', !matches);
+			if (matches) anyVisible = true;
+		});
+		noMatch?.toggleAttribute('hidden', anyVisible);
+	}
+
+	document.getElementById('clear-filter')?.addEventListener('click', (event) => {
+		event.preventDefault();
+		window.location.href = window.location.pathname;
+	});
+
+	applyStarredState();
+	applyTagFilter();
+</script>

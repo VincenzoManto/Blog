@@ -1,0 +1,54 @@
+---
+layout: '../../layouts/PaperLayout.astro'
+title: 'Thinking as a Shannonian process with a cost: the Metacognitive Engine'
+author: 'Vincenzo Manto'
+date: '2026-06-02'
+abstract: 'This article introduces the Metacognitive Engine Model (Cognitive Agent with Rationally Bounded Inference), a theoretical framework that describes the decision-making agent as an adaptive and strategically rational computational system. Unlike classical models of perfect rationality or descriptive catalogs of cognitive biases, the Metacognitive Engine posits that decision-making behavior, including its apparent errors and irrationalities, is the emergent outcome of a metacognitive optimization process. The agent actively manages a multidimensional, capacity-limited cognitive architecture, allocating its scarce resources to balance the desire for accuracy with a domain-specific aversion to cognitive effort. The agent is predictive, not passive: it uses an internal model of the world to filter information and focus resources only on what is novel and relevant. Metacognitive Engine aims to provide a unified, mechanistic, and predictive model of thinking and decision-making, capable of explaining individual variability in terms of ability, knowledge, and motivational profiles.'
+keywords:
+  - Philosophy
+  - Thinking
+  - Information Theory
+---
+# Thinking as a Shannonian process with a cost
+
+Since my second Bachelor year in Computer Science Engineering, I loved Shannon Theory of Information: I always thought his findings are life-changing for those who study it and their implications can be "infinite". Then I discovered someone has applied it to Economics way before I was born (Sims) and this was the final proof I was right.
+
+For a few months now, in my spare time, I've been working on an idea that's been bubbling around in my head ever since I started doing refractions in the shop and, concurrently, working as a tax consultant in my family firm. They're two different professions, but in both, I often observe people who, faced with the same information, reach very different conclusions—not because of a lack of intelligence, but because at a certain point they stop processing and rely on a shortcut. As a computer engineer, the question I asked myself is simple: is that shortcut a mistake, or is it a rational decision made by a system with limited resources?
+
+I don't have a definitive answer. However, I've tried to build a model, which I'll call the Metacognitive Engine for convenience, to make that question more precise and, if possible, verifiable.
+
+## The beginning
+
+Behavioral economics has carefully cataloged dozens of cognitive biases: loss aversion, anchoring, availability and confirmation. It's valuable work, but it remains largely descriptive. It explains what happens, less often explaining why the system is the way it is.
+
+A different line of thought, less well-known outside of economics, starts with another question: what if the brain isn't making mistakes at all, but rather you're simply solving a constraint optimization problem, where processing information comes at a cost? This idea has a specific name in the literature—rational inattention—and was formalized by Christopher Sims in 2003. The intuition is that thinking consumes a scarce resource and a rational agent doesn't process more than is worth processing, given how important the decision is.
+
+I find this idea more solid, as a starting point, than a simple catalog of biases. Not because biases don't exist, but because a model that says "the system is optimal given a constraint" makes testable predictions, while a catalog of anomalies doesn't.
+
+## What I tried to add
+
+Sims' model treats the cost of information as a fixed parameter, the same for every type of content. In my experience, this isn't the case. People (and I suspect I do too) find it easier to update their beliefs on neutral topics than on topics that touch on their identity or past choices. The cost is not uniform; it depends on the domain and how consistent the new information is with what is already believed.
+
+I therefore attempted to build a more complex architecture, in which:
+
+- the agent has a limited, domain-specific processing capacity, not a single number;
+- the cost of processing information depends on how dissonant it is with the model of the world already possessed, not just on its quantity in bits;
+- aversion to cognitive effort is not fixed, but is learned over time based on past efforts.
+
+The result is a system that, at its extremes, reproduces recognizable behaviors: zero capacity, paralysis; aversion to infinite effort, purely heuristic thinking; perceived zero stakes, adaptive superficiality. This isn't a surprising result; it's more of a check on internal consistency: if the model produces absurd results at its limits, there's something wrong with the formulation.
+
+## What this work isn't
+
+It's worth being honest about this point, especially since it's the part that took me the longest to digest. This isn't a verified scientific contribution. It's an internally coherent theoretical construction, with some solid parts (the connection to the rational inattention literature is real and well-founded) and others that are still open.
+
+In particular, two things are still missing that they consider essential before we can speak of a theory in the true sense, rather than a working hypothesis:
+
+First, a way to estimate the model's parameters (cognitive capacity, effort aversion, memory access cost) from data independent of the behaviors the model aims to explain. Without this, the real risk is that the model will adapt to any a posteriori observation, making it little more than an elegant description, not a falsifiable theory.
+
+Second, a prediction that the model makes that existing models don't, testable in a real experiment, not just in a theoretical edge case.
+
+Until these two points are addressed, I prefer to call this a formalization exercise, not a discovery.
+
+## Why I'm writing it anyway
+
+Because building the model, even in this incomplete form, has helped me think more precisely about very concrete situations: why in a store two customers with the same information about the lens arrive at opposite decisions, why in the office some customers immediately update their statements when shown an error, while others resist even in the face of evidence. I don't need the model to be publishable on
