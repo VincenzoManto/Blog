@@ -38,6 +38,7 @@ const sortedArticles = allArticles.sort((a, b) => {
 					class="card"
 					data-article-id={article.url}
 					data-keywords={(article.frontmatter.keywords || []).map((k) => k.toLowerCase()).join('|')}
+					data-default-starred={article.frontmatter.starred ? 'true' : 'false'}
 				>
 					<button type="button" class="star-toggle" data-article-id={article.url} aria-label="Toggle favorite" title="Toggle favorite">☆</button>
 					<h3><a href={article.url}>{article.frontmatter.title}</a></h3>
@@ -94,51 +95,56 @@ const sortedArticles = allArticles.sort((a, b) => {
 </style>
 
 <script>
-	const STORAGE_KEY = 'starredArticles';
+	// Star state = frontmatter `starred: true` (set in code, ships baked into the page)
+	// overridden per-browser by manual clicks, stored as an override map in localStorage.
+	const STORAGE_KEY = 'starredArticlesOverrides';
 
-	function getStarred(): string[] {
+	function getOverrides(): Record<string, boolean> {
 		try {
-			return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+			return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
 		} catch {
-			return [];
+			return {};
 		}
 	}
 
-	function setStarred(ids: string[]) {
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+	function setOverrides(overrides: Record<string, boolean>) {
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
+	}
+
+	function isStarred(card: HTMLElement, overrides: Record<string, boolean>): boolean {
+		const id = card.dataset.articleId || '';
+		if (id in overrides) return overrides[id];
+		return card.dataset.defaultStarred === 'true';
 	}
 
 	function applyStarredState() {
-		const starred = getStarred();
+		const overrides = getOverrides();
 		const list = document.getElementById('articles-list');
 		if (!list) return;
 
 		document.querySelectorAll<HTMLButtonElement>('.star-toggle').forEach((button) => {
-			const id = button.dataset.articleId;
-			const isStarred = !!id && starred.includes(id);
-			button.textContent = isStarred ? '★' : '☆';
-			button.classList.toggle('starred', isStarred);
-			button.closest('.card')?.classList.toggle('starred', isStarred);
+			const card = button.closest<HTMLElement>('.card');
+			const starred = !!card && isStarred(card, overrides);
+			button.textContent = starred ? '★' : '☆';
+			button.classList.toggle('starred', starred);
+			card?.classList.toggle('starred', starred);
 		});
 
 		const cards = Array.from(list.querySelectorAll<HTMLElement>('.card'));
 		cards
-			.sort((a, b) => {
-				const aStarred = starred.includes(a.dataset.articleId || '') ? 1 : 0;
-				const bStarred = starred.includes(b.dataset.articleId || '') ? 1 : 0;
-				return bStarred - aStarred;
-			})
+			.sort((a, b) => Number(isStarred(b, overrides)) - Number(isStarred(a, overrides)))
 			.forEach((card) => list.appendChild(card));
 	}
 
 	document.addEventListener('click', (event) => {
 		const button = (event.target as HTMLElement)?.closest<HTMLButtonElement>('.star-toggle');
-		if (!button || !button.dataset.articleId) return;
+		const card = button?.closest<HTMLElement>('.card');
+		if (!button || !card || !card.dataset.articleId) return;
 
-		const id = button.dataset.articleId;
-		const starred = getStarred();
-		const next = starred.includes(id) ? starred.filter((s) => s !== id) : [...starred, id];
-		setStarred(next);
+		const id = card.dataset.articleId;
+		const overrides = getOverrides();
+		overrides[id] = !isStarred(card, overrides);
+		setOverrides(overrides);
 		applyStarredState();
 	});
 
