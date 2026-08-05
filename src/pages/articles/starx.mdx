@@ -7,7 +7,7 @@ author: "Vincenzo Manto, Riccardo Dal Cero"
 date: "2026-06-15"
 starred: true
 link: "https://datastripes.com"
-abstract: "Starx is a conversational econometric analysis platform that bridges the gap between business users and quantitative methods. Users upload tabular datasets — sales records, financial statements, operational time series — and interact with an AI assistant that autonomously dispatches a suite of analytical tools: exploratory profiling, data cleaning, statistical transformations, causal discovery, external macro enrichment, model fitting, and Monte Carlo scenario simulation. Every numerical output is grounded in a tool execution; the system is architecturally prohibited from fabricating estimates. This document describes the platform's design principles, analytical capabilities, tool architecture, and the reasoning behind each technical decision."
+abstract: "Datastripes Studio is a conversational econometric analysis platform that bridges the gap between business users and quantitative methods. Users upload tabular datasets — sales records, financial statements, operational time series — and interact with an AI assistant that autonomously dispatches a suite of analytical tools: exploratory profiling, data cleaning, statistical transformations, causal discovery, external macro enrichment, model fitting, and Monte Carlo scenario simulation. Every numerical output is grounded in a tool execution; the system is architecturally prohibited from fabricating estimates. This document describes the platform's design principles, analytical capabilities, tool architecture, and the reasoning behind each technical decision."
 keywords:
   - Econometrics
   - AI
@@ -15,7 +15,7 @@ keywords:
   - Business Intelligence
 ---
 
-# Starx
+# Datastripes Studio
 ## AI-Powered Econometric Analysis Platform
 
 **Technical Whitepaper · v0.1 · June 2026**
@@ -24,7 +24,7 @@ keywords:
 
 ## Abstract
 
-Starx is a conversational econometric analysis platform that bridges the gap between business users and quantitative methods. Users upload tabular datasets — sales records, financial statements, operational time series — and interact with an AI assistant that autonomously dispatches a suite of analytical tools: exploratory profiling, data cleaning, statistical transformations, causal discovery, external macro enrichment, model fitting, and Monte Carlo scenario simulation. Every numerical output is grounded in a tool execution; the system is architecturally prohibited from fabricating estimates. This document describes the platform's design principles, analytical capabilities, tool architecture, and the reasoning behind each technical decision.
+Datastripes Studio is a conversational econometric analysis platform that bridges the gap between business users and quantitative methods. Users upload tabular datasets — sales records, financial statements, operational time series — and interact with an AI assistant that autonomously dispatches a suite of analytical tools: exploratory profiling, data cleaning, statistical transformations, causal discovery, external macro enrichment, model fitting, and Monte Carlo scenario simulation. Every numerical output is grounded in a tool execution; the system is architecturally prohibited from fabricating estimates. This document describes the platform's design principles, analytical capabilities, tool architecture, and the reasoning behind each technical decision.
 
 ---
 
@@ -34,7 +34,7 @@ Quantitative analysis in mid-market firms is bottlenecked by two competing const
 
 Off-the-shelf business intelligence tools address visualisation and reporting but not inference. Statistical packages address inference but require programming expertise. Large-language-model assistants can narrate data but typically lack the disciplined computational back-end needed for trustworthy quantitative claims.
 
-Starx is designed to close this gap. The core design constraint is: **the AI assistant may never state a number it has not computed**. All figures, coefficients, percentages, and forecasts must originate from a verifiable tool call whose output is logged in the session artifact store.
+Datastripes Studio is designed to close this gap. The core design constraint is: **the AI assistant may never state a number it has not computed**. All figures, coefficients, percentages, and forecasts must originate from a verifiable tool call whose output is logged in the session artifact store.
 
 ---
 
@@ -406,4 +406,4 @@ The following invariants are enforced architecturally, not by convention:
 
 ---
 
-*Starx — Confidential. June 2026.*
+*Datastripes Studio — Confidential. June 2026.*
