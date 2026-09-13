@@ -28,7 +28,6 @@
         "tab.activeBorderTop": "#0d0d0d",
         "pickerGroup.foreground": "#0d0d0d",
         "list.activeSelectionBackground": "#0004d",
-        "panelTitle.activeBorder": "#0d0d0d",
-        "activityBar.activeBorder": "#000"
+        "panelTitle.activeBorder": "#0d0d0d"
     }
 }

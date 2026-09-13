@@ -32,6 +32,14 @@ function extractSubjectId(line: string) {
 	const match = line.match(/\b(\d{8,9})\b/);
 	return match ? match[1] : null;
 }
+
+// A minor planet has a "formal" numeric designation once numbered by the MPC,
+// e.g. "747601" or "(747601)", as opposed to a provisional designation like "2019 AB123".
+function extractFormalNumber(designation: string) {
+	if (!designation) return null;
+	const match = String(designation).trim().match(/^\(?(\d+)\)?$/);
+	return match ? match[1] : null;
+}
 ---
 
 <Layout title="Astronomy">
@@ -88,7 +96,13 @@ function extractSubjectId(line: string) {
               {minorPlanets.map((planet: any, i: number) => (
                 <tr>
                   <td>{planet['Subject ID']}</td>
-                  <td>{planet['Designation']}</td>
+                  <td>
+                    {extractFormalNumber(planet['Designation']) ? (
+                      <a href={`https://www.pyroorb.net/?object=${extractFormalNumber(planet['Designation'])}`} target="_blank">{planet['Designation']}</a>
+                    ) : (
+                      planet['Designation']
+                    )}
+                  </td>
                   <td>{planet['Category']}</td>
                   <td>
                     {planet['Link'] ? <a href={planet['Link']} target="_blank">MPEC</a> : <span style="color: #aaa;">N/A</span>}

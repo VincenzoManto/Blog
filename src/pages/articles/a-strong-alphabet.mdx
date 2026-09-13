@@ -1,0 +1,83 @@
+---
+title: "An alphabet maximizing visual distinctiveness"
+description: "Come costruire un alfabeto ottimizzato geometricamente contro la confusione percettiva, e cosa succede quando la metrica scelta smette di essere d'accordo con te."
+date: "2026-08-06"
+tags: ["design", "percezione", "python", "generative-design"]
+---
+
+# Designing an alphabet for maximum visual distinctiveness
+
+Every historical alphabet (Latin, Cyrillic, optotype systems like the Sloan letters) is a compromise between legibility, calligraphic tradition, and handwriting speed. None of these systems was designed by explicitly optimizing a single thing: the minimum perceptual distance between each pair of symbols. This article describes an attempt to do so from scratch, and especially what happens when the results do not confirm the initial hypothesis.
+
+This is not a classical information theory problem (bits per symbol). It is a code design problem applied to a perceptual space: given N glyphs, maximizing the minimum pairwise distance in a visual feature space, exactly as in error-correcting codes, but with a perceptual metric instead of the bitwise Hamming distance.
+
+The most dangerous trap in this space is the isometrically related pairs: b/d/p/q (reflection), 6/9 (180° rotation), n/u. An ordinary font offers no protection against these confusions because it has never been optimized to resist symmetry transformations.
+
+## Method I used: grid generation + greedy selection
+
+**Primitives.** Each glyph is a subset of strokes on a 4x4 grid of points. In the first version, the strokes were only straight segments; in the second version, arcs were added (quadratic Bézier curves, positive or negative bulge), under the assumption that increasing the topological variety of shapes would also improve the pure shape metrics, not just the area ones.
+
+**Candidates.** Each candidate glyph is generated as a connected random walk on the grid (3-6 steps), with an optional branch to increase morphological variety. Selection is made from a pool of 600-800 unique candidates.
+
+**Distance.** The reference metric is the Jaccard distance between the bitmap rasterizations of the glyphs, made robust to symmetries: for each pair, the minimum distance is calculated by considering all 8 dihedral transformations (90°/180°/270° rotations, reflections) of one of the two glyphs. This explicitly penalizes pairs that can be confused by rotation or reflection, not just those overlapping in the same orientation.
+
+**Selection.** Sampling of the furthest point: starting from a glyph, the candidate that maximizes the minimum distance is iteratively added among all the glyphs already selected. This is the same principle used in packing codes with guaranteed distance.
+
+```python
+def farthest_point_sampling(bmps, n_select, seed_idx=0):
+    transforms = [dihedral_transforms(b) for b in bmps]
+    selected = [seed_idx]
+    remaining = set(range(len(bmps))) - {seed_idx}
+    while len(selected) < n_select and remaining:
+        best_idx, best_score = None, -1.0
+        for idx in remaining:
+            score = min(
+                symmetry_aware_distance(bmps[idx], transforms[s])
+                for s in selected
+            )
+            if score > best_score:
+                best_score, best_idx = score, idx
+        selected.append(best_idx)
+        remaining.discard(best_idx)
+    return selected
+```
+
+## Benchmark
+
+Optimizing for a single metric risks producing a result that only wins on paper. I therefore compared the generated alphabet (v1 without edges, v2 with edges) against four real alphabets (uppercase Latin, lowercase Latin, digits, Sloan letters) on five different metrics:
+
+- **Jaccard**: normalized area overlap, local and set-theoretic.
+- **Hamming**: fraction of discordant pixels, the simplest and most blind to the global shape.
+- **Hausdorff**: maximum distance to the nearest point, captures the geometric worst case and is sensitive to outliers.
+- **Chamfer**: average of the nearest-point distances in both directions, more robust than Hausdorff.
+- **Hu moments**: shape descriptors invariant to rotation, scale, and translation. It is the only purely topological metric of the group: it doesn't look at where the line is, it looks at what shape it has.
+
+## Risultati
+
+<img src="/assets/alphabet.svg" al />
+
+
+| Alfabeto | Jaccard | Hamming | Hausdorff | Chamfer | Hu moments |
+|---|---|---|---|---|---|
+| **This alphabet** | **0.761** | 0.021 | **0.243** | 0.044 | 0.752 |
+| Latin uppercase | 0.174 | 0.027 | 0.070 | 0.004 | 1.458 |
+| Latin lowercase | 0.108 | 0.008 | 0.031 | 0.001 | 0.471 |
+| 0-9 | 0.250 | **0.045** | 0.066 | 0.004 | 0.069 |
+| Sloan letters | 0.211 | 0.045 | 0.088 | 0.004 | **4.135** |
+(bold values: winner by metric, highest minimum distance)
+
+## The hypothesis that failed
+
+The addition of edges was supposed to diversify the topology of the shapes and thus improve the distance on Hu moments, the only metric in the group that ignores absolute position and looks only at the shape. This didn't happen: the worst-case Hu moments worsened, from 0.946 (v1) to 0.752 (v2), although the average distance improved significantly (from 13.8 to 7.4, so on average the shapes are more diverse, but the most similar pair is more similar than before).
+
+Most likely interpretation: the added edges have a fixed curvature and a limited variation space, so they introduce new shapes, but some of these end up being topologically similar to each other (same combination of curves and angles), even if they occupy different areas of the grid. Increasing the position isn't enough without also increasing the variety of the primitive set itself: variable radii of curvature would be needed, not just two fixed bulges.
+
+On Sloan letters, the gap remains enormous (4.135 versus 0.752): a set designed by ophthalmologists for threshold visual acuity, not for this metric, remains undefeated precisely on the "purest" dimension of the comparison. This is a useful reminder: optimizing a proxy metric (geometric overlap) doesn't guarantee optimization of all the distinguishability dimensions that matter, including the most abstract one.
+
+## What remains
+
+On the four remaining metrics, the generated alphabet consistently beats all the real alphabets tested, often by 3-4x margins on the worst case. For a use case that prioritizes pure geometric distinguishability, at the expense of calligraphic tradition and handwriting speed (which were not optimized here), the method works. For a use case related to pure form independent of rotation/scale, no: you need to rethink the primitive space.
+
+## Code
+
+Complete scripts (generator, shared module, benchmark) are available in the project repository. The `alphabet_core.py` module contains all the generation, rasterization, and selection logic shared between the generator and the benchmark, to avoid drift between what is generated and what is measured.
