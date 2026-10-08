@@ -1,0 +1,44 @@
+---
+layout: '../../layouts/PaperLayout.astro'
+title: 'StrangeAttractors: a small, honest experiment in edge computing'
+author: 'Vincenzo Manto'
+date: '2026-10-02'
+abstract: 'A short account of building StrangeAttractors, a self-expanding global catalog of chaotic attractors discovered not by a supercomputer but by ordinary browser tabs running Web Workers. The article describes the two-stage RK4 integration screen, the consensus-based verification pipeline, and the batching etiquette that makes the whole thing possible without ever asking for more than a laptop and an open tab.'
+keywords:
+  - chaos theory
+  - edge computing
+  - attractors
+  - web workers
+---
+
+# StrangeAttractors: a small, honest experiment in edge computing
+
+I want to be upfront: I didn't set out to build anything impressive. I just had a question I couldn't shake — how many strange attractors are actually out there, hiding in parameter space, that nobody has bothered to write down? The classics (Lorenz, Rössler, Aizawa, Rikitake, Dadras) are famous because someone happened to stumble on them decades ago. But the space of possible polynomial and literature-derived systems is enormous, and almost none of it has been explored. So, modestly, I started poking at it.
+
+I didn't have a cluster. I don't have one now either. What I had was a browser tab.
+
+## Starting from the smallest possible unit of compute
+
+The idea that eventually became **StrangeAttractors** is embarrassingly simple: instead of trying to convince anyone to lend me GPU time, I wrote a two-stage RK4 integrator that runs inside a Web Worker, sitting quietly in whatever tab happens to be open. It samples random polynomial systems (and a few literature-derived families as seeds), integrates them, and checks whether the trajectory shows genuine deterministic chaos — not a fixed point, not a periodic orbit, but a real positive-Lyapunov-exponent mess that never repeats.
+
+That's it. There's no "platform" in the grand sense. It's thousands of ordinary laptops, each doing a tiny, honest slice of a very large search, which is really just the original idea of edge computing before the term got overloaded: push the work to where people already are, instead of pretending you need a data center to ask a math question.
+
+## Being suspicious of your own results
+
+The one thing I was genuinely careful about — because I got burned by my own optimism early on — is that a browser tab is not a trustworthy witness. Floating-point drift accumulates, RK4 step sizes interact with chaos in unkind ways, and it's trivially easy for a bug to "discover" a beautiful attractor that is actually just numerical garbage.
+
+So nothing a tab finds is taken at face value. Every candidate that looks chaotic gets re-checked against the existing consensus registry through three separate invariance tests: metric overlap with known structures, parity/reflection symmetry, and continuation through nearby parameter space. Only if it survives all three does it get a registry id and join the global ledger. I'd rather have a smaller database I believe than a large one I'm embarrassed by.
+
+## Not hammering the server, because that matters too
+
+I also didn't want the project to be a bad neighbor on the network. A verification server is someone's shared resource, even if that someone is just me on a free tier. So discoveries get queued client-side and flushed in batches of twenty to thirty (or on a timeout), and metadata edits go through as a single transaction rather than a flood of individual requests. It's a small courtesy, but it felt like it mattered — being considerate of shared infrastructure is part of doing this kind of citizen-science project responsibly, not an afterthought you bolt on once things get slow.
+
+## Letting people steer, a little
+
+The last piece I added, almost apologetically, is the ability for someone to point the search instead of just letting it roam. You can restrict a parameter to a range grounded in the literature, or draw a box directly on the Lyapunov/divergence atlas and bias the hunt toward that region. I added this mostly because I didn't want the project to feel like a slot machine you just pull — if someone has a hunch about where something interesting might live, they should be able to go look.
+
+## Where it stands
+
+As I write this, the global ledger has a few hundred verified attractors in it, found since the project went live. It's not a lot, by the standards of actual research infrastructure. But every single one of them was found by someone's open tab, doing a little bit of honest integration while they were reading something else entirely. That still feels, to me, like the right way to have built this.
+
+If you want to poke at it yourself, open a tab and let it run for a while. You might find something nobody has seen before. I certainly didn't expect to.
