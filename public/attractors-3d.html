@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Discovered Attractors — 3D Viewer</title>
+<style>
+  :root {
+    --bg: #0b0d12;
+    --panel: #12151c;
+    --border: #232936;
+    --text: #e7e9ee;
+    --muted: #8b93a3;
+    --accent: #6ea8fe;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow: hidden;
+    height: 100%;
+  }
+  #app { position: relative; width: 100%; height: 100vh; }
+  canvas { display: block; }
+  #ui {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    z-index: 10;
+    pointer-events: none;
+  }
+  #ui > * { pointer-events: auto; }
+  .chip {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .chip:hover { color: var(--text); border-color: var(--accent); }
+  .chip.active {
+    color: #0b0d12;
+    background: var(--accent);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  #info {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    max-width: min(480px, 90vw);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--muted);
+    z-index: 10;
+  }
+  #info b { color: var(--text); }
+  #info code {
+    display: block;
+    margin-top: 6px;
+    color: var(--accent);
+    font-size: 11.5px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  #hint {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    font-size: 11px;
+    color: var(--muted);
+    opacity: 0.7;
+    z-index: 10;
+  }
+  @media (max-width: 640px) {
+    #info { right: 12px; max-width: none; }
+    #hint { display: none; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="ui"></div>
+  <div id="info"></div>
+  <div id="hint">drag to rotate · scroll to zoom</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const API_URL = "https://www.insightest.app/apps/attractors/api/server.php?action=list&limit=50";
+const SURVEYOR = "V. Manto";
+
+// A small fixed palette, cycled over however many attractors come back from the API.
+const PALETTE = [0x6ea8fe, 0x7ee787, 0xf2cc60, 0xff8fa3, 0xb983ff, 0x5de4c7, 0xffa657, 0x9dd6ff, 0xf687b3, 0xa0e65b];
+
+function toAttractor(entry, color) {
+  const eq = entry.equations || {};
+  const params = eq.paramLabels && eq.params
+    ? eq.paramLabels.map((l, i) => `${l}=${Number(eq.params[i]).toFixed(2)}`).join(', ')
+    : '';
+  const formulaParts = eq.formulaText ? [eq.formulaText.dx, eq.formulaText.dy, eq.formulaText.dz].filter(Boolean) : [];
+  return {
+    id: entry.id,
+    name: entry.name || entry.codeName || entry.id,
+    alias: entry.customAlias || entry.codeName || '',
+    lambda: entry.metrics ? entry.metrics.lyapunovExponent : null,
+    dkY: entry.metrics ? entry.metrics.fractalDimension : null,
+    color,
+    formula: formulaParts.length ? formulaParts.join(' · ') : params,
+    sparseTerms: eq.sparseTerms,
+    ic: entry.initialCondition || [0.1, 0.1, 0.1],
+    dt: eq.dt || 0.02
+  };
+}
+
+let ATTRACTORS = [];
+
+async function loadAttractors() {
+  const info = document.getElementById('info');
+  info.innerHTML = 'Loading discoveries from the StrangeAttractors registry…';
+  const res = await fetch(API_URL);
+  if (!res.ok) throw new Error('API request failed: ' + res.status);
+  const data = await res.json();
+  const mine = data.filter(e => e.surveyorName === SURVEYOR && e.equations && e.equations.sparseTerms);
+  if (!mine.length) throw new Error('No attractors found for surveyor "' + SURVEYOR + '"');
+  ATTRACTORS = mine.map((e, i) => toAttractor(e, PALETTE[i % PALETTE.length]));
+}
+
+// Monomial basis, as inferred from the server's sparseTerms encoding: 0=1,1=x,2=y,3=z,4=x²,5=y²,6=z²,7=xy,8=yz,9=xz
+function monomial(m, x, y, z) {
+  switch (m) {
+    case 0: return 1;
+    case 1: return x;
+    case 2: return y;
+    case 3: return z;
+    case 4: return x * x;
+    case 5: return y * y;
+    case 6: return z * z;
+    case 7: return x * y;
+    case 8: return y * z;
+    case 9: return x * z;
+    default: return 0;
+  }
+}
+
+function derivative(terms, x, y, z) {
+  let s = 0;
+  for (const t of terms) s += t.coeff * monomial(t.monomial, x, y, z);
+  return s;
+}
+
+function integrate(attractor, steps) {
+  const { sparseTerms, ic, dt } = attractor;
+  let [x, y, z] = ic;
+  const pts = [];
+  const f = (x, y, z) => [
+    derivative(sparseTerms.termsX, x, y, z),
+    derivative(sparseTerms.termsY, x, y, z),
+    derivative(sparseTerms.termsZ, x, y, z)
+  ];
+  for (let i = 0; i < steps; i++) {
+    const k1 = f(x, y, z);
+    const k2 = f(x + k1[0]*dt/2, y + k1[1]*dt/2, z + k1[2]*dt/2);
+    const k3 = f(x + k2[0]*dt/2, y + k2[1]*dt/2, z + k2[2]*dt/2);
+    const k4 = f(x + k3[0]*dt, y + k3[1]*dt, z + k3[2]*dt);
+    x += (dt/6) * (k1[0] + 2*k2[0] + 2*k3[0] + k4[0]);
+    y += (dt/6) * (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]);
+    z += (dt/6) * (k1[2] + 2*k2[2] + 2*k3[2] + k4[2]);
+    if (!isFinite(x) || !isFinite(y) || !isFinite(z) || Math.abs(x) > 1e4 || Math.abs(y) > 1e4 || Math.abs(z) > 1e4) break;
+    if (i > 400) pts.push(x, y, z); // discard transient
+  }
+  return pts;
+}
+
+// --- Three.js scene ---
+const app = document.getElementById('app');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0d12);
+
+const camera = new THREE.PerspectiveCamera(55, app.clientWidth / app.clientHeight, 0.01, 1000);
+camera.position.set(0, 0, 6);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(app.clientWidth, app.clientHeight);
+app.insertBefore(renderer.domElement, app.firstChild);
+
+const group = new THREE.Group();
+scene.add(group);
+
+const grid = new THREE.GridHelper(4, 10, 0x232936, 0x1a1e27);
+grid.position.y = -1.6;
+group.add(grid);
+
+let currentLine = null;
+
+function normalizePoints(flat) {
+  let minX=Infinity,minY=Infinity,minZ=Infinity,maxX=-Infinity,maxY=-Infinity,maxZ=-Infinity;
+  for (let i = 0; i < flat.length; i += 3) {
+    minX = Math.min(minX, flat[i]); maxX = Math.max(maxX, flat[i]);
+    minY = Math.min(minY, flat[i+1]); maxY = Math.max(maxY, flat[i+1]);
+    minZ = Math.min(minZ, flat[i+2]); maxZ = Math.max(maxZ, flat[i+2]);
+  }
+  const cx=(minX+maxX)/2, cy=(minY+maxY)/2, cz=(minZ+maxZ)/2;
+  const scale = 2.6 / Math.max(maxX-minX, maxY-minY, maxZ-minZ, 1e-6);
+  const out = new Float32Array(flat.length);
+  for (let i = 0; i < flat.length; i += 3) {
+    out[i] = (flat[i]-cx)*scale;
+    out[i+1] = (flat[i+1]-cy)*scale;
+    out[i+2] = (flat[i+2]-cz)*scale;
+  }
+  return out;
+}
+
+function showAttractor(att) {
+  if (currentLine) { group.remove(currentLine); currentLine.geometry.dispose(); currentLine.material.dispose(); }
+  const flat = integrate(att, 60000);
+  const points = normalizePoints(flat);
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(points, 3));
+  const material = new THREE.LineBasicMaterial({ color: att.color, transparent: true, opacity: 0.85 });
+  currentLine = new THREE.Line(geometry, material);
+  group.add(currentLine);
+
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.id === att.id));
+  document.getElementById('info').innerHTML =
+    `<b>${att.name}</b> <span style="color:${'#'+att.color.toString(16).padStart(6,'0')}">●</span> (${att.alias})<br/>` +
+    `λ = ${att.lambda.toFixed(3)} · Kaplan–Yorke dim ≈ ${att.dkY.toFixed(3)}<br/>` +
+    `<code>${att.formula}</code>`;
+}
+
+// UI chips
+const ui = document.getElementById('ui');
+function buildUI() {
+  ui.innerHTML = '';
+  ATTRACTORS.forEach((att) => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.dataset.id = att.id;
+    chip.textContent = att.name;
+    chip.addEventListener('click', () => showAttractor(att));
+    ui.appendChild(chip);
+  });
+}
+
+loadAttractors()
+  .then(() => {
+    buildUI();
+    showAttractor(ATTRACTORS[0]);
+  })
+  .catch((err) => {
+    document.getElementById('info').innerHTML = `<b>Could not load the registry.</b><br/><code>${err.message}</code>`;
+  });
+
+// Manual orbit controls (drag to rotate, wheel to zoom) — no addon dependency
+let isDragging = false, prevX = 0, prevY = 0;
+let rotX = 0.3, rotY = 0.4;
+renderer.domElement.addEventListener('pointerdown', (e) => { isDragging = true; prevX = e.clientX; prevY = e.clientY; });
+window.addEventListener('pointerup', () => { isDragging = false; });
+window.addEventListener('pointermove', (e) => {
+  if (!isDragging) return;
+  rotY += (e.clientX - prevX) * 0.005;
+  rotX += (e.clientY - prevY) * 0.005;
+  prevX = e.clientX; prevY = e.clientY;
+});
+renderer.domElement.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  camera.position.z = Math.min(20, Math.max(1.5, camera.position.z + e.deltaY * 0.002));
+}, { passive: false });
+
+let autoSpin = true;
+renderer.domElement.addEventListener('pointerdown', () => { autoSpin = false; });
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (autoSpin) rotY += 0.0015;
+  group.rotation.x = rotX;
+  group.rotation.y = rotY;
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = app.clientWidth / app.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(app.clientWidth, app.clientHeight);
+});
+</script>
+</body>
+</html>

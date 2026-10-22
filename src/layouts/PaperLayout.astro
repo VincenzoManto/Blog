@@ -1,11 +1,29 @@
 ---
 import Layout from './Layout.astro';
-const { frontmatter } = Astro.props;
+const { frontmatter, file } = Astro.props;
 import { renderInlineMarkdown } from '../lib/markdown';
 
+const slug = file ? file.split(/[\\/]/).pop()?.replace(/\.mdx?$/, '') : undefined;
+const doiId = frontmatter.doi ? String(frontmatter.doi).replace(/^.*doi\.org\//, '') : undefined;
+const authors = frontmatter.author ? String(frontmatter.author).split(',').map((a: string) => a.trim()) : ['Vincenzo Manto'];
+const pdfUrl = doiId && slug ? `${import.meta.env.BASE_URL}preprints/${slug}.pdf` : undefined;
 ---
 
 <Layout title={frontmatter.title}>
+	<Fragment slot="head">
+		{doiId && (
+			<>
+				<meta name="citation_title" content={frontmatter.title} />
+				{authors.map((a: string) => <meta name="citation_author" content={a} />)}
+				{frontmatter.date && <meta name="citation_publication_date" content={new Date(frontmatter.date).toISOString().slice(0, 10)} />}
+				<meta name="citation_doi" content={doiId} />
+				{pdfUrl && <meta name="citation_pdf_url" content={new URL(pdfUrl, Astro.site).toString()} />}
+				<meta name="citation_abstract_html_url" content={new URL(Astro.url.pathname, Astro.site).toString()} />
+				{frontmatter.keywords && frontmatter.keywords.map((k: string) => <meta name="citation_keyword" content={k} />)}
+				{frontmatter.abstract && <meta name="description" content={frontmatter.abstract} />}
+			</>
+		)}
+	</Fragment>
 	<article>
 	<table>
 		<tr>
@@ -34,13 +52,18 @@ import { renderInlineMarkdown } from '../lib/markdown';
 				))}</td>
 			</tr>
 		)}
-		{frontmatter.doi && (
+		{doiId && (
 			<tr>
 				<td><strong>DOI:</strong></td>
-				<td><a href={`https://doi.org/${frontmatter.doi}`} target="_blank">{frontmatter.doi}</a></td>
+				<td><a href={`https://doi.org/${doiId}`} target="_blank">{doiId}</a></td>
 			</tr>
 		)}
-		
+		{pdfUrl && (
+			<tr>
+				<td><strong>Preprint PDF:</strong></td>
+				<td><a href={pdfUrl} target="_blank">Download PDF</a></td>
+			</tr>
+		)}
 	</table>
 		<header style="text-align: center; margin-bottom: 2rem; border-bottom: none;">
 			<h1 style="width: 100%;     text-align: center;margin-bottom: 40px;border-bottom: 2px solid #000;padding-bottom: 10px;" >{frontmatter.title}</h1>

@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/generate-pdfs.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "oeis": "node scripts/fetch-oeis-cache.mjs"
@@ -19,6 +19,8 @@
     "astro": "^6.4.2",
     "chart.js": "^4.5.1",
     "fast-xml-parser": "^5.8.0",
+    "gray-matter": "^4.0.3",
+    "pdfkit": "^0.20.2",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "xlsx": "^0.18.5"
