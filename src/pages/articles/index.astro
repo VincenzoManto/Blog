@@ -19,10 +19,10 @@ const sortedArticles = allArticles.sort((a, b) => {
 // ?search=<tag> therefore happens client-side (see <script> below), not here.
 ---
 
-<Layout title="Papers & Articles">
-	<h2>Papers & Articles</h2>
+<Layout title="Projects & Articles">
+	<h2>Projects & Articles</h2>
 	<p>
-	Here some of the papers and articles I think are worth mentioning. They cover a range of topics in mathematics, computer science, and related fields.
+	These are some of my side projects. I tried to formalized them to extract something good out of then. They cover a range of topics in mathematics, computer science, and related fields.
 	I'm honored to have co-authored several papers with esteemed colleagues like {[...new Set(sortedArticles.map(article => article.frontmatter.author?.split(',') || []).flat())].filter(e => e.trim() !== 'Vincenzo Manto').join(', ')}.
 	</p>
 
