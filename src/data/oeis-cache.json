@@ -469,6 +469,53 @@
     "created": "2026-07-20T00:43:48-04:00"
   },
   {
+    "number": 400485,
+    "data": "1,3,3,7,6,6,13,21,15,25,18,15,14,14,29,45,31,49,34,27,24,23,23,47,36,31,29,57,43,73,52,42,75,109,72,54,91,129,84,62,103,145,94,69,57,103,75,123,86,68,119,171,112,83,69,125,91,149,104,82,143,205,134",
+    "name": "a(1) = 1; for n > 1: if a(n-1) + n is odd, a(n) = a(n-1) + n else a(n) = (a(n-1) + n)/2.",
+    "comment": [
+      "Consecutive terms repeat when a(n-1) = n and such pairs occur for n = 3, 6, 14, 23, 211, 793, 8190, 8208. The next pair is at n = 62906549.",
+      "The value of a(n)/n appears to be bound between 1 and approximately 3.66. This range is also observed for sequences when a(1) is seeded with integers > 1 (except for initial terms)."
+    ],
+    "link": [
+      "James C. McMahon, <a href=\"/A400485/b400485.txt\">Table of n, a(n) for n = 1..10000</a>",
+      "Vincenzo Manto, <a href=\"/A400485/a400485.png\">a(n) vs n and phase of a(n) graphs</a>"
+    ],
+    "formula": [
+      "Repeating values: when a(n-1) = n, a(n-1) + n = 2n (even), therefore, a(n) = 2n/2 = n. Additionally, when a(n-2) = n + 1, a(n-2) + (n-1) = 2n (even), therefore a(n - 1) = 2n/2 = n."
+    ],
+    "example": [
+      "For n = 2: a(n-1) + n = 1 + 2 = 3 (odd), so a(2) = 3.",
+      "For n = 3: a(n-1) + n = 3 + 3 = 6 (even), so a(3) = 6/2 = 3."
+    ],
+    "mathematica": [
+      "s={1}; Do[If[OddQ[s[[-1]]+n],AppendTo[s,s[[-1]]+n],AppendTo[s,(s[[-1]]+n)/2]],{n,2,63}];s"
+    ],
+    "program": [
+      "(Python)",
+      "def generate_sequence(size, a1=1):",
+      "  a = [0] * (size + 1)",
+      "  a[1] = a1",
+      "  for n in range(2, size + 1):",
+      "    val = a[n - 1] + n",
+      "    if val % 2 != 0:",
+      "      a[n] = val",
+      "    else:",
+      "      a[n] = val // 2",
+      "  return a[1:]",
+      "print(generate_sequence(63))"
+    ],
+    "xref": [
+      "Cf. A006370."
+    ],
+    "keyword": "nonn,easy",
+    "offset": "1,2",
+    "author": "_James C. McMahon_ and _Vincenzo Manto_, Sep 27 2026",
+    "references": 2,
+    "revision": 19,
+    "time": "2026-10-11T20:21:07-04:00",
+    "created": "2026-10-11T20:21:07-04:00"
+  },
+  {
     "number": 390002,
     "data": "1,1,2,3,5,7,1,1,2,3,5,8,1,1,2,4,6,9,1,2,3,4,7,1,1,2,3,5,8,1,1,2,4,6,9,1,2,3,4,7,1,1,2,3,5,8,1,1,2,4,6,9,1,2,3,4,7,1,1,2,3,5,8,1,1,2,4,6,9,1,2,3,4,7,1,1,2,3,5,8,1,1,2,4,6,9,1",
     "name": "Leading digit of 15^n.",
@@ -1186,6 +1233,55 @@
     "created": "2026-08-06T18:07:55-04:00"
   },
   {
+    "number": 400113,
+    "data": "1,3,6,1,6,0,3,11,20,5,16,2,5,19,34,9,26,4,7,27,48,13,36,6,9,35,62,17,46,8,11,43,76,21,56,10,13,51,90,25,66,12,15,59,104,29,76,14,17,67,118,33,86,16,19,75,132,37,96,18,21,83,146,41,106,20,23,91,160,45",
+    "name": "a(1) = 1; for n > 1: if a(n-1) is odd, a(n) = a(n-1) + n else a(n) = floor(abs(a(n-1) - n)/2).",
+    "comment": [
+      "The value of a(n)/n, for n >= 10, appears to be bounded between 1/6 and 7/3.",
+      "It appears that sequences seeded with initial values a(1) > 1 eventually merge into the same trajectory after a finite number of steps."
+    ],
+    "link": [
+      "Vincenzo Manto, <a href=\"/A400113/b400113.txt\">Table of n, a(n) for n = 1..10000</a>",
+      "Vincenzo Manto, <a href=\"/A400113/a400113.png\">a(n) vs n and phase of a(n) graphs</a>."
+    ],
+    "formula": [
+      "When a(n-1) is odd, a(n) = a(n-1) + n. When a(n-1) is even, a(n) = floor(abs(a(n-1) - n)/2)."
+    ],
+    "example": [
+      "For n = 2: a(1) is odd (1), so a(2) = 1 + 2 = 3.",
+      "For n = 3: a(2) is odd (3), so a(3) = 3 + 3 = 6.",
+      "For n = 4: a(3) is even (6), so a(4) = abs(6 - 4)/2 = 2/2 = 1.",
+      "For n = 6: a(5) is even (6), so a(6) = abs(6 - 6)/2 = 0."
+    ],
+    "mathematica": [
+      "s={1};Do[If[OddQ[s[[-1]]],AppendTo[s,s[[-1]]+n],AppendTo[s,Quotient[Abs[s[[-1]]-n],2]]],{n,2,70}];s"
+    ],
+    "program": [
+      "(Python)",
+      "def generate_sequence(size, a1=1):",
+      "  a = [0] * (size + 1)",
+      "  a[1] = a1",
+      "  for n in range(2, size + 1):",
+      "    prev = a[n - 1]",
+      "    if prev % 2 != 0:",
+      "      a[n] = prev + n",
+      "    else:",
+      "      a[n] = abs(prev - n) // 2",
+      "  return a[1:]",
+      "print(generate_sequence(70))"
+    ],
+    "xref": [
+      "Cf. A400485, A006370."
+    ],
+    "keyword": "nonn,easy,new",
+    "offset": "1,2",
+    "author": "_Vincenzo Manto_ and _James C. McMahon_, Oct 17 2026",
+    "references": 1,
+    "revision": 29,
+    "time": "2026-10-29T21:33:06-04:00",
+    "created": "2026-10-29T21:33:06-04:00"
+  },
+  {
     "number": 394504,
     "data": "0,10,110,200,210,1110,1210,2200,2210,3000,3010,3110,3200,3210,11110,11210,12210,13110,13210,22200,22210,23200,23210,33000,33010,33110,33200,33210,40000,40010,40110,40200,40210,41110,41210,42200,42210,43000,43010,43110,43200,43210",
     "name": "Numbers such that each digit d_i is equal to the number of digits to its right that are strictly less than d_i.",
@@ -1351,52 +1447,5 @@
     "revision": 17,
     "time": "2026-08-26T09:43:54-04:00",
     "created": "2026-08-20T17:48:14-04:00"
-  },
-  {
-    "number": 400485,
-    "data": "1,3,3,7,6,6,13,21,15,25,18,15,14,14,29,45,31,49,34,27,24,23,23,47,36,31,29,57,43,73,52,42,75,109,72,54,91,129,84,62,103,145,94,69,57,103,75,123,86,68,119,171,112,83,69,125,91,149,104,82,143,205,134",
-    "name": "a(1) = 1; for n > 1: if a(n-1) + n is odd, a(n) = a(n-1) + n else a(n) = (a(n-1) + n)/2.",
-    "comment": [
-      "Consecutive terms repeat when a(n-1) = n and such pairs occur for n = 3, 6, 14, 23, 211, 793, 8190, 8208. The next pair is at n = 62906549.",
-      "The value of a(n)/n appears to be bound between 1 and approximately 3.66. This range is also observed for sequences when a(1) is seeded with integers > 1 (except for initial terms)."
-    ],
-    "link": [
-      "James C. McMahon, <a href=\"/A400485/b400485.txt\">Table of n, a(n) for n = 1..10000</a>",
-      "Vincenzo Manto, <a href=\"/A400485/a400485.png\">a(n) vs n and phase of a(n) graphs</a>"
-    ],
-    "formula": [
-      "Repeating values: when a(n-1) = n, a(n-1) + n = 2n (even), therefore, a(n) = 2n/2 = n. Additionally, when a(n-2) = n + 1, a(n-2) + (n-1) = 2n (even), therefore a(n - 1) = 2n/2 = n."
-    ],
-    "example": [
-      "For n = 2: a(n-1) + n = 1 + 2 = 3 (odd), so a(2) = 3.",
-      "For n = 3: a(n-1) + n = 3 + 3 = 6 (even), so a(3) = 6/2 = 3."
-    ],
-    "mathematica": [
-      "s={1}; Do[If[OddQ[s[[-1]]+n],AppendTo[s,s[[-1]]+n],AppendTo[s,(s[[-1]]+n)/2]],{n,2,63}];s"
-    ],
-    "program": [
-      "(Python)",
-      "def generate_sequence(size, a1=1):",
-      "  a = [0] * (size + 1)",
-      "  a[1] = a1",
-      "  for n in range(2, size + 1):",
-      "    val = a[n - 1] + n",
-      "    if val % 2 != 0:",
-      "      a[n] = val",
-      "    else:",
-      "      a[n] = val // 2",
-      "  return a[1:]",
-      "print(generate_sequence(63))"
-    ],
-    "xref": [
-      "Cf. A006370."
-    ],
-    "keyword": "nonn,easy,new",
-    "offset": "1,2",
-    "author": "_James C. McMahon_ and _Vincenzo Manto_, Sep 27 2026",
-    "references": 0,
-    "revision": 19,
-    "time": "2026-10-11T20:21:07-04:00",
-    "created": "2026-10-11T20:21:07-04:00"
   }
 ]

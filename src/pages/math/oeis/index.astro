@@ -15,10 +15,10 @@ const last = data[data.length - 1];
 
 <Layout title="Mathematics">
   <h2 style="margin-bottom: 2.5rem;">Integer Sequences (OEIS)</h2>
-  <p style="color: var(--color-text-light); margin-bottom: 2rem;">Vincenzo Manto is the author of {data.length} integer sequences in the OEIS database.
+  <p style="color: var(--color-text-light); margin-bottom: 2rem;">In the free time I try to formalize new integer sequences. Up to now I authored {data.length} integer sequences in the OEIS database.
   {data.length > 0 && <>
-  His work has contributed to the field of integer sequences, ranging from <code>{first.custom?.name || first.seq?.name}</code> (A{first.seq.number}) to <code>{last.custom?.name || last.seq?.name}</code> (A{last.seq.number}).<br/>
-  His most prolific partners include {[...topCollaborators].join(', ')}.<br/>
+  My "strange" research ranges from <code>{first.custom?.name || first.seq?.name}</code> (A{first.seq.number}) to <code>{last.custom?.name || last.seq?.name}</code> (A{last.seq.number}).<br/>
+  I'd like to thank a lot my partners in this adventure: {[...topCollaborators].join(', ')}.<br/>
   These sequences have been cited by {data.reduce((acc: number, { seq }) => acc + (seq.xref?.length || 0), 0)} other sequences, making him a {perc}-percentile contributor.
   </>}
   </p>
